@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import styled from "styled-components"
+import * as Color from '../../components/layout/Color'
 import { format, isAfter } from 'date-fns'
 import { IoMdAddCircle } from "react-icons/io"
 import { IoHeartCircleSharp } from "react-icons/io5"
-import { FaStar, FaStarHalf } from "react-icons/fa"
 import { BsFillPlayCircleFill } from "react-icons/bs"
+import DisplayStar from '../../components/common/DisplayStar'
 
 const posterURL = 'https://image.tmdb.org/t/p/w500'
 
@@ -340,15 +341,6 @@ const MovieInfo = ({ selectDay }) => {
     setAutoplay('?autoplay=1')
   }
 
-  function displayStar(starPoints) {
-    const starToFive = Math.round(starPoints / 2)
-    const starElement = [];
-    for (let i = 0; i < starToFive; i += 1) {
-      starElement.push(<StarIcon />)
-    }
-    return <StarWrapper>{ starElement }<p>{starPoints}</p></StarWrapper>
-  }
-
   function nowIsPlaying(resultReleaseDate) {
     const formatSelectDay = format(selectDay, 'yyyy-MM-dd').split('-').map(e => parseInt(e, 10))
     const releaseDate = resultReleaseDate.split('-').map(e => parseInt(e, 10))
@@ -388,7 +380,9 @@ const MovieInfo = ({ selectDay }) => {
               <AddToCalendarIcon />
               <AddToCollectionIcon />
               <MovieName>{result.original_title}</MovieName>
-              {displayStar(result.vote_average)}
+              <StarWrapper>
+                <DisplayStar starPoints={ result.vote_average }/>
+              </StarWrapper>
               <SubInfo>Release Date | {result.release_date}</SubInfo> <SubInfo>Reviews | {result.vote_count}</SubInfo>
               <OverView>
                 {result.overview}
@@ -404,7 +398,7 @@ const MovieInfo = ({ selectDay }) => {
 }
 
 const Wrapper = styled.div`
-  /* background-color: #aaa; */
+  /* background-color: ${Color.Background}; */
   position: relative;
   padding-left: 220px;
   padding-bottom: 150px;
@@ -470,14 +464,6 @@ const StarWrapper = styled.div`
   margin-top: 30px;
   font-size: 20px;
 `
-const StarIcon = styled(FaStar)`
-  color: white;
-  margin-right: 5px;
-`
-// const StarHalfIcon = styled(FaStarHalf)`
-//   color: white;
-//   margin-right: 5px;
-// `
 const SubInfo = styled.span`
   display: inline-block;
   margin-top: 5px;

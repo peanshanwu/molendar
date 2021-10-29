@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { FaStar, FaStarHalf } from "react-icons/fa"
 import { useSpring } from 'react-spring'
+import DisplayStar from '../../components/common/DisplayStar'
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
-import * as Color from '../../components/Color'
+import * as Color from '../../components/layout/Color'
 
 // fake data
 
@@ -117,35 +118,36 @@ const nowPlayingData = {
 }
 
 
-function Banner() {
+function getRandomMovie(max) {
+  return Math.floor(Math.random() * max);
+}
+
+function Banner({ nowPlayingMovie }) {
 
   const [clickTrailer, setClickTrailer] = useState(false)
   const [autoplay, setAutoplay] = useState('')
+  const randomIndex = getRandomMovie(nowPlayingMovie.results.length)
+  const movieData = nowPlayingMovie.results[randomIndex]
 
   function clickPlay() {
     setClickTrailer(true)
     setAutoplay('?autoplay=1')
   }
 
-  function displayStar(starPoints) {
-    const starToFive = Math.round(starPoints / 2)
-    const starElement = [];
-    for (let i = 0; i < starToFive; i += 1) {
-      starElement.push(<StarIcon />)
-    }
-    return <StarWrapper>{ starElement }<p>{starPoints}</p></StarWrapper>
-  }
-
   return (
-    <Wrapper>
+    <Wrapper backdrop={movieData.backdrop_path}>
       <Gradient>
         <Youtube style={ clickTrailer ? {display:'block'} : {display:'none'} } src={`https://www.youtube.com/embed/jU8VNQKKF-g`} title="YouTube video player" frameBorder="0" allow="autoplay; encrypted-media" allowFullScreen/>
         <Container>
-          <MovieName>{nowPlayingData.results[1].original_title}</MovieName>
-          {displayStar(nowPlayingData.results[1].vote_average)}
-          <SubInfo>Release Date | {nowPlayingData.results[1].release_date}</SubInfo> <SubInfo>Reviews | {nowPlayingData.results[1].vote_count}</SubInfo>
+          <Link to={`/movie/${movieData.id}`}>
+            <MovieName>{movieData.original_title}</MovieName>
+          </Link>
+          <StarWrapper>
+            <DisplayStar starPoints={ movieData.vote_average }/>
+          </StarWrapper>
+          <SubInfo>Release Date | {movieData.release_date}</SubInfo> <SubInfo>Reviews | {nowPlayingData.results[1].vote_count}</SubInfo>
           <OverView>
-            {nowPlayingData.results[1].overview}
+            {movieData.overview}
           </OverView>
           <Trailer onClick={clickPlay}> Watch Trailer</Trailer>
         </Container>
@@ -156,7 +158,7 @@ function Banner() {
 }
 
 const Wrapper = styled.section`
-  background-image: url(https://image.tmdb.org/t/p/w1280/8Y43POKjjKDGI9MH89NW0NAzzp8.jpg);
+  background-image: url(https://image.tmdb.org/t/p/w1280/${(props)=>props.backdrop });
   background-size: cover;
   background-position-x: 20vw;
   background-repeat: no-repeat;

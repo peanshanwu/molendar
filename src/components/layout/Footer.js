@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import logo from '../image/footer-logo.png'
+import logo from '../../image/footer-logo.png'
 import { useSpring } from 'react-spring'
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 import * as Color from './Color'
