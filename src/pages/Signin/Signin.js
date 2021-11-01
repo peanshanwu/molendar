@@ -21,7 +21,7 @@ function Signin() {
   
   async function socialMediaClick(provider) {
     setIsLoading(true)
-    const response = await socialMediaAuth(provider)
+    const response = await socialMediaAuth(provider);
     console.log(response);
     setIsLoading(false)
     history.push('/');
@@ -145,7 +145,7 @@ const Container = styled.div`
   border-radius: 10px;
   padding: 70px 50px;
   text-align: center;
-  width: 600px;
+  width: 45%;
   height: 500px;
   background-color: ${Color.Content};
   color: ${Color.Main}

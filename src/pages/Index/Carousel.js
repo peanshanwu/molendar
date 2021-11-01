@@ -1,10 +1,10 @@
 import HorizontalScroll from 'react-horizontal-scrolling'
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import * as Color from "../../components/layout/Color"
 import styled from 'styled-components'
 import DisplayStar from '../../components/common/DisplayStar'
-import Loading from '../../components/layout/Loading'
+// import Loading from '../../components/layout/Loading'
 
 
 function Carousel({ upComingMovie }) {

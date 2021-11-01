@@ -31,6 +31,8 @@ function Index() {
       setNowPlayingMovie(nowPlaying);
       setIsLoading(false)
     })
+
+    // 要記得清除fetchAPI
   }, [])
 
   return (isLoading ? <Main><Loading /></Main> :

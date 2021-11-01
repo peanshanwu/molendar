@@ -43,7 +43,8 @@ export const PersonalCalendar = styled.table`
 		width: 142px;
 		text-align: center;
 		&.selected {
-				background-color: ${Color.Main};
+				background-color: ${Color.Background};
+				/* color: ${Color.Main}; */
 		}
 		&.other{
 				color: ${Color.Dark};

@@ -6,6 +6,7 @@ import Index from './pages/Index/Index'
 import Personal from './pages/Personal/Personal'
 import Signin from './pages/Signin/Signin'
 import Movie from './pages/Movie/Movie'
+import Edit from './pages/Personal/Edit'
 import Search from './components/layout/Search'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
@@ -30,6 +31,9 @@ function App() {
         </Route>
         <Route exact path="/movie/:id">
           <Movie />
+        </Route>
+        <Route exact path="/edit/:id">
+          <Edit />
         </Route>
         {/* <Route path="/" exact compnent={Index} /> */}
         {/* <Route path="/movie/" compnent={Movie} /> */}

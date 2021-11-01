@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
-import { FaStar, FaStarHalf } from "react-icons/fa"
-import { useSpring } from 'react-spring'
-import DisplayStar from '../../components/common/DisplayStar'
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 import * as Color from '../../components/layout/Color'
+import Slider from "react-slick";
+import DisplayStar from '../../components/common/DisplayStar'
+import { MdDelete } from "react-icons/md"
+import { FaPen } from "react-icons/fa"
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
+
 
 // fake data
-
 const nowPlayingData = {
   "dates": {
       "maximum": "2021-10-26",
@@ -117,71 +120,160 @@ const nowPlayingData = {
   ]
 }
 
-
-function getRandomMovie(max) {
-  return Math.floor(Math.random() * max);
-}
-
-function Banner({ nowPlayingMovie }) {
-
-  const [clickTrailer, setClickTrailer] = useState(false)
-  const [autoplay, setAutoplay] = useState('')
-  const randomIndex = getRandomMovie(nowPlayingMovie.results.length)
-  const movieData = nowPlayingMovie.results[randomIndex]
-
-  function clickPlay() {
-    setClickTrailer(true)
-    setAutoplay('?autoplay=1')
+function Info({popupClick, setPopupClick}) {
+  const settings = {
+    dots: false,
+    infinite: true,
+    speed: 600,
+    slidesToShow: 1,
+    slidesToScroll: 1
   }
 
   return (
-    <Wrapper backdrop={movieData.backdrop_path}>
-      <Gradient>
-        <Youtube style={ clickTrailer ? {display:'block'} : {display:'none'} } src={`https://www.youtube.com/embed/jU8VNQKKF-g`} title="YouTube video player" frameBorder="0" allow="autoplay; encrypted-media" allowFullScreen/>
-        <Container>
-          <Link to={`/movie/${movieData.id}`}>
-            <MovieName>{movieData.original_title}</MovieName>
-          </Link>
-
-          <StarWrapper>
-            <DisplayStar starPoints={ movieData.vote_average }/>
-          </StarWrapper>
-          <SubInfo>Release Date | {movieData.release_date}</SubInfo> <SubInfo>Reviews | {movieData.vote_count}</SubInfo>
-          <OverView>
-            {movieData.overview}
-          </OverView>
-          <Trailer onClick={clickPlay}> Watch Trailer</Trailer>
-        </Container>
-      </Gradient>
-    </Wrapper>
+    <>
+      {popupClick &&
+        <>
+        <Mask onClick={ ()=> setPopupClick(false) }></Mask>
+        <Wrapper>
+          <Slider {...settings}>
+            <Container>
+              <Header>
+                <Date>1/10<DayOfWeek>Mon</DayOfWeek></Date>
+                <WatchWithPic />
+                <WatchWithName>Shan<WatchWithOthers>and others...</WatchWithOthers></WatchWithName>
+                <DeleteIcon />
+                <Link to={`/edit/${nowPlayingData.results[1].id}`}>
+                  <EditIcon/>
+                </Link>
+              </Header>
+              <Wrap>
+                <Link to="/movie">
+                  <MovieName>{ nowPlayingData.results[1].original_title }</MovieName>
+                </Link>
+                <StarWrapper>
+                  <DisplayStar starPoints={ nowPlayingData.results[1].vote_average }/>
+                </StarWrapper>
+                <SubInfo>Release Date | {nowPlayingData.results[1].release_date}</SubInfo> <SubInfo>Reviews | {nowPlayingData.results[1].vote_count}</SubInfo>
+                <OverView>
+                  {nowPlayingData.results[1].overview}
+                </OverView>
+                {/* <Trailer onClick={clickPlay}> Watch Trailer</Trailer> */}
+              </Wrap>
+            </Container>
+            <Container>
+              <Header>
+                <Date>1/10<DayOfWeek>Mon</DayOfWeek></Date>
+                <WatchWithPic />
+                <WatchWithName>Shan<WatchWithOthers>and others...</WatchWithOthers></WatchWithName>
+                <DeleteIcon />
+                <Link to={`/edit/${nowPlayingData.results[1].id}`}>
+                  <EditIcon/>
+                </Link>
+              </Header>
+              <Wrap>
+                <Link to="/movie">
+                  <MovieName>{ nowPlayingData.results[1].original_title }</MovieName>
+                </Link>
+                <StarWrapper>
+                  <DisplayStar starPoints={ nowPlayingData.results[1].vote_average }/>
+                </StarWrapper>
+                <SubInfo>Release Date | {nowPlayingData.results[1].release_date}</SubInfo> <SubInfo>Reviews | {nowPlayingData.results[1].vote_count}</SubInfo>
+                <OverView>
+                  {nowPlayingData.results[1].overview}
+                </OverView>
+                {/* <Trailer onClick={clickPlay}> Watch Trailer</Trailer> */}
+              </Wrap>
+            </Container>
+          </Slider>
+        </Wrapper>
+      </>}
+    </>
   )
 
 }
 
+const iconStyle = {
+  fontSize: "1.9rem",
+  color: Color.Main,
+  cursor: "pointer",
+  WebkitFilter: "drop-shadow(0 1px 5px rgba(0, 0, 0, 1))",
+  filter: "drop-shadow(0 1px 5px rgba(0, 0, 0, 1))",
+  "transition": ".3s ease",
+  "&:hover": {
+    color: Color.Content,
+    WebkitFilter: "drop-shadow(0 0 5px rgba(0, 204, 204, 1))",
+    filter: "drop-shadow(0 0 5px rgba(0, 204, 204, 1))"
+  }
+}
+const Mask = styled.section`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+`
 const Wrapper = styled.section`
-  background-image: url(https://image.tmdb.org/t/p/w1280/${(props)=>props.backdrop });
+  color: ${Color.Content};
+  width: 60%;
+  position: fixed;
+  z-index: 2;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 500px;
+  box-shadow: 2px 3px 50px rgba(0, 0, 0, .7);
+  /* outline: 2px solid red; */
+  /* background-color: #fff; */
+  `
+const Container = styled.main`
+  padding: 20px 30px;
+  background-image: url('https://image.tmdb.org/t/p/w1280/8Y43POKjjKDGI9MH89NW0NAzzp8.jpg');
   background-size: cover;
-  background-position-x: 20vw;
   background-repeat: no-repeat;
   position: relative;
-  height: 700px;
+  height: 500px;
   color: white;
   background-color: ${Color.Background};
 `
-const Gradient = styled.div`
+const Header = styled.div`
+  /* position: fixed;
+  top: 0; */
   display: flex;
   align-items: center;
-  width: 100%;
-  height: 100%;
-  padding-left: 220px;
-  background: linear-gradient(90deg, ${Color.Background} 20% , transparent );
-  color: ${Color.Content}
 `
-const Container = styled.div`
-  max-width: 500px;
+const Wrap = styled.section`
+  max-width: 40%;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+`
+const Date = styled.h3`
+  color: ${Color.Main};
+  font-size: 2rem;
+`
+const DayOfWeek = styled.span`
+  font-size: 1rem;
+  margin-left: 10px;
+`
+const WatchWithPic = styled.div`
+  background-image: url(https://lh3.googleusercontent.com/a/AATXAJwKXgG-Z-dC9Nzz_b5nw5M_HO57C9p4j61PqKfr=s96-c);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+`
+const WatchWithName = styled.p`
+  font-size: 1rem;
+  margin-right: auto;
+`
+const WatchWithOthers = styled.span`
+  margin-left: 15px;
+  font-size: 1rem;
 `
 const MovieName = styled.h1`
-  font-size: 52px;
+  font-size: 3rem;
   width: 100%;
 `
 const StarWrapper = styled.div`
@@ -190,9 +282,6 @@ const StarWrapper = styled.div`
   margin-top: 30px;
   font-size: 20px;
   color: ${Color.Main};
-`
-const StarIcon = styled(FaStar)`
-  margin-right: 5px;
 `
 const SubInfo = styled.span`
   display: inline-block;
@@ -206,31 +295,14 @@ const OverView = styled.p`
   font-weight: 300;
   line-height: 24px;
 `
-const Trailer = styled.button`
-  border: none;
-  font-size: 18px;
-  font-weight: bold;
-  color: ${Color.Content};
-  margin-top: 30px;
-  width: 180px;
-  height: 50px;
-  background-color: ${Color.Sub};
-  transition: ease-in .3s;
-  cursor: pointer;
-  &:hover {
-    color: ${Color.Main};
-    background-color: ${Color.Content};
-    box-shadow: 0 0 30px rgba(0, 204, 204, .5);
-  }
+const DeleteIcon = styled(MdDelete)`
+  ${iconStyle};
+  margin-left: auto;
 `
-const Youtube = styled.iframe`
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 999;
-  width: 80vw;
-  height: 80vh;
+const EditIcon = styled(FaPen)`
+  ${iconStyle};
+  font-size: 1.5rem;
+  margin-left: 1rem;
 `
 
-export default Banner
+export default Info
