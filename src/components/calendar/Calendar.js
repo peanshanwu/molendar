@@ -1,10 +1,9 @@
 import React from 'react'
 import { useState } from 'react'
-import { format, getDate, isSameDay, isAfter } from 'date-fns'
+import { format, getDate, isSameDay } from 'date-fns'
 import useCalendar, { WEEKS } from './useCalendar.js'
 import * as Styled from './Calendar-styled'
 import styled from 'styled-components'
-import { logDOM } from '@testing-library/dom'
 
 // const Calendar = ({ setSelectDay }) => {
 	

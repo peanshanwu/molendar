@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components'
-import logo from '../image/logo.png'
-import { useSpring } from 'react-spring'
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
-import * as Color from './Color'
+import logo from '../../image/logo.png'
+import { Link } from 'react-router-dom'
 
 
 function Logo() {
