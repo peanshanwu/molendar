@@ -132,7 +132,7 @@ const MovieInfo = ({ selectDay }) => {
   }
 
   function nowIsPlaying(resultReleaseDate) {
-    const formatSelectDay = format(selectDay, 'yyyy-MM-dd').split('-').map(e => parseInt(e, 10))
+    const formatSelectDay = format(selectDay, 'yyyy-MM-dd').split('-').map(e => parseInt(e, 10)) //parseInt轉成數字
     const releaseDate = resultReleaseDate.split('-').map(e => parseInt(e, 10))
     const nowPlaying = isAfter(new Date(formatSelectDay[0], formatSelectDay[1], formatSelectDay[2]), new Date(releaseDate[0], releaseDate[1], (releaseDate[2]-1))) //因為是after，為了上映當天也符合，所以-1
     return nowPlaying 

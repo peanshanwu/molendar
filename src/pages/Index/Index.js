@@ -7,8 +7,7 @@ import Banner from './Banner'
 import Carousel from './Carousel'
 import Calendar from '../../components/calendar/Calendar'
 import calendarBackground from '../../image/index-calendar-bg.png'
-import { fetchMovies, fetchMovie } from '../../utils/api'
-import { tr } from 'date-fns/locale'
+import { fetchUpcomingNoPlayingMovies } from '../../utils/api'
 
 
 function Index() {
@@ -24,7 +23,7 @@ function Index() {
     //   setUpComingMovie(upcomingMovies)
     //   setIsLoading(false)
     // })
-    fetchMovies().then(([upcoming, nowPlaying]) => {
+    fetchUpcomingNoPlayingMovies().then(([upcoming, nowPlaying]) => {
       console.log('upComingMovie', upcoming);
       console.log('nowPlayingMovie', nowPlaying);
       setUpComingMovie(upcoming);

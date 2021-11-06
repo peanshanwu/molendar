@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route, Link, useHistory } from 'react-router-dom'
 import { TiThMenu } from 'react-icons/ti'
 import { AiFillHome } from 'react-icons/ai'
 import { BiLogOut } from 'react-icons/bi'
@@ -11,17 +11,18 @@ import Nav from './Nav'
 import firebase from '../../utils/firebase'
 
 
-function Header() {
+function Header({ user }) {
+  const history = useHistory();
 
-  const [user, setUser] = useState(null) //儲存user狀態，要改成redux
+  // const [user, setUser] = useState(null) //儲存user狀態，要改成redux
 
 
-  React.useEffect(() => {
-    firebase.auth().onAuthStateChanged((currentUser) => {
-      console.log('onAuthStateChanged 回傳',currentUser);
-      setUser(currentUser)
-    })
-  },[])
+  // React.useEffect(() => {
+  //   firebase.auth().onAuthStateChanged((currentUser) => {
+  //     console.log('onAuthStateChanged 回傳',currentUser);
+  //     setUser(currentUser)
+  //   })
+  // },[])
 
 
   // const [hamClick, setHamClick] = useState(false)
@@ -48,6 +49,7 @@ function Header() {
           // 優化，不要用alert
           if (window.confirm("Do you really want to leave?")) {
             firebase.auth().signOut()
+            history.push('/');
           } else { return }
         }} />}
 
@@ -85,9 +87,9 @@ const NavContainer = styled.section`
   height: 100vh;
   background-color: ${Color.Sub};
 `
-const HamIcon = styled(TiThMenu)`
-  ${iconStyle};
-`
+// const HamIcon = styled(TiThMenu)`
+//   ${iconStyle};
+// `
 const HomeIcon = styled(AiFillHome)`
   ${iconStyle};
 `
@@ -105,7 +107,6 @@ const CollectionIcon = styled(FaHeart)`
 const LogoutIcon = styled(BiLogOut)`
   ${iconStyle};
   margin-top: auto;
-
 `
 
 

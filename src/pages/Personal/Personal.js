@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Background from '../../image/member-bg.png'
 import PersonalCalendar from './PersonalCalendar'
@@ -6,81 +6,150 @@ import style from 'react-horizontal-scrolling/dist/style'
 import Profile from './Profile'
 import * as Color from '../../components/layout/Color'
 import { ImCheckmark, ImCross } from "react-icons/im"
+import firebase from '../../utils/firebase'
+import { set } from 'date-fns'
+
+
+function Personal({ uid, currentUserInfo, userList, myCalendarMovies, calendarMoviesInfo }) {
+
+
+  const db = firebase.firestore();
+  const userRef = db.collection('users');
+  const [selectDay, setSelectDay] = useState(new Date()) 
+  // const [userInfo, setUserInfo] = useState(null)
+  
+  // useEffect(() => {
+
+  //   uid && (
+  //     userRef.doc(uid).get()
+  //     .then((doc) => {
+  //       console.log(`doc, `, doc.data());
+  //       return doc.data()
+  //     })
+  //     .then((data) => { setUserInfo(data) })
+  //     .catch(err => {
+  //       console.log(err);
+  //     })
+  //   )
+
+  // }, [uid])  // 原本寫空陣列～問谷哥
 
 
 
 
-function Personal() {
+  // useEffect(() => {
+  //   setUid(firebase.auth().currentUser.uid)    
+  // }, [])
+  
+  // console.log(firebase.auth().currentUser.uid);
+  // function a(uid) {
+  //   userRef.doc(uid).get()
+  //   .then((doc) => {
+  //     console.log(`doc, `, doc.data());
+  //     return doc.data()
+  //   })
+  //   .catch(err => {
+  //     console.log(err);
+  //   })
+  // }
+  // set(a(uid))
 
-  const [selectDay, setSelectDay] = useState(new Date())
+
+  // userRef.doc(uid).get()
+  //   .then((doc) => {
+  //     console.log(`doc, `, doc.data());
+  //     return doc.data()
+  //   })
+  //   .then((data) => { set(data) })
+
+  // function b() {
+  //   return (userRef.doc(uid).get()
+  //   .then((doc) => {
+  //     console.log(`doc, `, doc.data());
+  //     return doc.data()
+  //   }))
+  // }
+
+  // b().then
   
   return (
-    <Wrapper>
-      <Main>
-        <Container>
-          <Profile />
-          <PersonalCalendar setSelectDay={setSelectDay} selectDay={selectDay} />
-          <Wrap>
-            <List>
-              <Title>Friend List</Title>
-              <SubContainer><Photo /><Name>Shan</Name></SubContainer>
-              <SubContainer><Photo /><Name>Shan</Name></SubContainer>
-              <SubContainer><Photo /><Name>Shan</Name></SubContainer>
-              <SubContainer><Photo /><Name>Shan</Name></SubContainer>
-              <SubContainer><Photo /><Name>Shan</Name></SubContainer>
-            </List>
-            <List>
-              <Title>Friend Invitation</Title>
-              <SubContainer>
-                <Photo /><Name>Shan</Name>
-                <IconWrap>
-                  <Accept /><Cansel />
-                </IconWrap>
-              </SubContainer>
-              <SubContainer>
-                <Photo /><Name>Kind</Name>
-                <IconWrap>
-                  <Accept /><Cansel />
-                </IconWrap>
-              </SubContainer>
-              <SubContainer>
-                <Photo /><Name>Of</Name>
-                <IconWrap>
-                  <Accept /><Cansel />
-                </IconWrap>
-              </SubContainer>
-              <SubContainer>
-                <Photo /><Name>Lit</Name>
-                <IconWrap>
-                  <Accept /><Cansel />
-                </IconWrap>
-              </SubContainer>
-            </List>
-            <List>
-              <Title>Movie Invitation</Title>
-                <SubContainer>
-                  <Photo /><Name>Shan</Name>
-                  <IconWrap>
-                    <Accept /><Cansel />
-                  </IconWrap>
-                </SubContainer>
-                <SubContainer>
-                  <Photo /><Name>Is</Name>
-                  <IconWrap>
-                    <Accept /><Cansel />
-                  </IconWrap>
-                </SubContainer>
-                <SubContainer>
-                  <Photo /><Name>Awesome</Name>
-                  <IconWrap>
-                    <Accept /><Cansel />
-                  </IconWrap>
-                </SubContainer>
-            </List>
-          </Wrap>
-        </Container>
-      </Main>
-    </Wrapper>
+    <>
+      { currentUserInfo && (
+        <Wrapper>
+          <Main>
+            <Container>
+              <Profile currentUserInfo={currentUserInfo} />
+              <PersonalCalendar
+                setSelectDay={setSelectDay}
+                selectDay={selectDay}
+                uid={uid}
+                userList={userList}
+                myCalendarMovies={myCalendarMovies}
+                calendarMoviesInfo={calendarMoviesInfo}
+              />
+              <Wrap>
+                <List>
+                  <Title>Friend List</Title>
+                  <SubContainer><Photo /><Name>Shan</Name></SubContainer>
+                  <SubContainer><Photo /><Name>Shan</Name></SubContainer>
+                  <SubContainer><Photo /><Name>Shan</Name></SubContainer>
+                  <SubContainer><Photo /><Name>Shan</Name></SubContainer>
+                  <SubContainer><Photo /><Name>Shan</Name></SubContainer>
+                </List>
+                <List>
+                  <Title>Friend Invitation</Title>
+                  <SubContainer>
+                    <Photo /><Name>Shan</Name>
+                    <IconWrap>
+                      <Accept /><Cansel />
+                    </IconWrap>
+                  </SubContainer>
+                  <SubContainer>
+                    <Photo /><Name>Lit</Name>
+                    <IconWrap>
+                      <Accept /><Cansel />
+                    </IconWrap>
+                  </SubContainer>
+                  <SubContainer>
+                    <Photo /><Name>Lit</Name>
+                    <IconWrap>
+                      <Accept /><Cansel />
+                    </IconWrap>
+                  </SubContainer>
+                  <SubContainer>
+                    <Photo /><Name>Lit</Name>
+                    <IconWrap>
+                      <Accept /><Cansel />
+                    </IconWrap>
+                  </SubContainer>
+                </List>
+                <List>
+                  <Title>Movie Invitation</Title>
+                    <SubContainer>
+                      <Photo /><Name>Shan</Name>
+                      <IconWrap>
+                        <Accept /><Cansel />
+                      </IconWrap>
+                    </SubContainer>
+                    <SubContainer>
+                      <Photo /><Name>Hola</Name>
+                      <IconWrap>
+                        <Accept /><Cansel />
+                      </IconWrap>
+                    </SubContainer>
+                    <SubContainer>
+                      <Photo /><Name>Yo</Name>
+                      <IconWrap>
+                        <Accept /><Cansel />
+                      </IconWrap>
+                    </SubContainer>
+                </List>
+              </Wrap>
+            </Container>
+          </Main>
+        </Wrapper>
+      )}
+    </>
   )
 
 }
@@ -123,7 +192,7 @@ const Title = styled.h3`
 `
 const List = styled.div`
   width: 32%;
-  outline: 1px solid red;
+  outline: 1px solid gray;
   margin-top: 30px;
   padding: 20px 40px;
   overflow-y: scroll;
