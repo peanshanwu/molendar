@@ -9,6 +9,7 @@ import { MdDelete } from "react-icons/md";
 import { FaPen } from "react-icons/fa";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import firebase from "../../utils/firebase";
 
 function Info({
   uid,
@@ -19,6 +20,9 @@ function Info({
   selectDay,
   userList,
 }) {
+  const db = firebase.firestore();
+  const userRef = db.collection("users");
+  const movieRef = db.collection("movie_invitations");
   const settings = {
     dots: true,
     infinite: true,
@@ -47,10 +51,15 @@ function Info({
     /*
       movieInfos = [
         {
+          doc_id: "",
+          event_doc_id: "",
+          scheduleOwner: "uid"
           movieInfo: {movieInfos},
           watchWith: [{userInfo}, {userInfo}, ...]
         },
         {
+          doc_id: "",
+          event_doc_id:"",
           movieInfo: {movieInfos},
           watchWith: [{userInfo}, {userInfo}, ...]
         },
@@ -62,6 +71,7 @@ function Info({
         const movieScheduleObj = {}; // 建立每個電影行程的obj
 
         movieScheduleObj.scheduleOwner = schedule.scheduleOwner;
+        movieScheduleObj.event_doc_id = schedule.event_doc_id;
         movieScheduleObj.doc_id = schedule.doc_id;
 
         const oneMovie = calendarMoviesInfo.find(
@@ -90,9 +100,35 @@ function Info({
     }
   }, [selectDayOfMyMovies]);
 
-  function deleteMovie(docId) {
-    // delete movie (雙方)
-    // delete invitation
+  function deleteMovie(delete_doc_id) {
+    // 所有行程刪除
+    db.collectionGroup("user_calendar")
+      .where("event_doc_id", "==", delete_doc_id)
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((docRef) => {
+          const docData = docRef.data();
+          console.log(docData);
+          console.log(docData.uid);
+          console.log(docData.doc_id);
+          userRef
+            .doc(docData.uid)
+            .collection("user_calendar")
+            .doc(docData.doc_id)
+            .delete();
+        });
+      });
+
+    // 邀請刪除
+    movieRef
+      .where("event_doc_id", "==", delete_doc_id)
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((docRef) => {
+          const docData = docRef.data();
+          movieRef.doc(docData.doc_id).delete();
+        });
+      });
   }
 
   console.log(`selectDayOfMyMovies`, selectDayOfMyMovies);
@@ -112,7 +148,7 @@ function Info({
             <Slider {...settings}>
               {selectDayOfMoviesInfo?.map((movie) => {
                 return (
-                  <Container backdrop={movie.movieInfo.backdrop_path}>
+                  <Container backdrop={movie.movieInfo?.backdrop_path}>
                     <Header>
                       <Day>
                         {format(selectDay, "MM / dd")}
@@ -132,7 +168,7 @@ function Info({
                         <>
                           <DeleteIcon
                             onClick={() => {
-                              deleteMovie(movie.doc_id);
+                              deleteMovie(movie.event_doc_id);
                             }}
                           />
                           <Link to={`/edit/${movie.doc_id}`}>

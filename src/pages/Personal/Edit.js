@@ -179,6 +179,9 @@ function Edit({
       });
     }
   }
+  function changeInvitation() {
+    movieInviteRef.where("");
+  }
 
   function editSave() {
     // 先統一轉好資料
@@ -217,25 +220,25 @@ function Edit({
         return arr.indexOf(element) === index;
       });
       console.log(`filtedRemoveInviteUid`, filtedRemoveInviteUid);
-      // filtedRemoveInviteUid.forEach((removeUid) => {
-      //   movieInviteRef
-      //     .where("to", "==", removeUid)
-      //     .where("doc_id", "==", paramId)
-      //     .onSnapshot((querySnapshot) => {
-      //       querySnapshot.forEach((docRef) => {
-      //         // 根據該id把movieInvitation的doc刪除
-      //         movieInviteRef
-      //           .doc(docRef.id)
-      //           .delete()
-      //           .then(() => {
-      //             console.log("delete!!");
-      //           })
-      //           .catch((err) => {
-      //             console.log(err);
-      //           });
-      //       });
-      //     });
-      // });
+      filtedRemoveInviteUid.forEach((removeUid) => {
+        movieInviteRef
+          .where("to", "==", removeUid)
+          .where("doc_id", "==", paramId)
+          .onSnapshot((querySnapshot) => {
+            querySnapshot.forEach((docRef) => {
+              // 根據該id把movieInvitation的doc刪除
+              movieInviteRef
+                .doc(docRef.id)
+                .delete()
+                .then(() => {
+                  console.log("delete!!");
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            });
+          });
+      });
     }
     // -新增;
     if (addInviteUid.length > 0) {
@@ -248,29 +251,30 @@ function Edit({
         return arr.indexOf(element) === index;
       });
       console.log(`filtedAddInviteUid`, filtedAddInviteUid);
-      // filtedAddInviteUid.forEach((addUid) => {
-      //   const data = {
-      //     date: selectDateData,
-      //     doc_id: paramId,
-      //     from: uid,
-      //     to: addUid,
-      //     movie_id: scheduleInfo.movie_id,
-      //     sendTime: firebase.firestore.Timestamp.fromDate(new Date()),
-      //   };
-      //   movieInviteRef
-      //     .add(data)
-      //     .then((docRef) => {
-      //       movieInviteRef
-      //         .doc(docRef.id)
-      //         .set({ invitation_id: docRef.id }, { merge: true });
-      //     })
-      //     .catch((err) => {
-      //       console.log(err);
-      //     });
-      // });
+      filtedAddInviteUid.forEach((addUid) => {
+        const data = {
+          date: selectDateData,
+          // doc_id: paramId,
+          event_doc_id: paramId,
+          from: uid,
+          to: addUid,
+          movie_id: scheduleInfo.movie_id,
+          sendTime: firebase.firestore.Timestamp.fromDate(new Date()),
+        };
+        movieInviteRef
+          .add(data)
+          .then((docRef) => {
+            movieInviteRef
+              .doc(docRef.id)
+              .set({ invitation_id: docRef.id }, { merge: true });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
     }
 
-    // history.push("/personal");
+    history.push("/personal");
   }
 
   function removeWatchwith(removeUid) {

@@ -145,13 +145,13 @@ const PersonalCalendar = ({
                           <MovieName>
                             {calendarMoviesInfo.length !== 0 &&
                               getMovieInfo(getMovieId(date.date))
-                                .original_title}
+                                ?.original_title}
                           </MovieName>
                           <Poster
                             src={
                               calendarMoviesInfo.length !== 0 &&
                               `https://image.tmdb.org/t/p/w500/${
-                                getMovieInfo(getMovieId(date.date)).poster_path
+                                getMovieInfo(getMovieId(date.date))?.poster_path
                               }`
                             }
                             alt=""

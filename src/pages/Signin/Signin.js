@@ -14,18 +14,58 @@ import firebase from "../../utils/firebase";
 import "firebase/auth";
 import socialMediaAuth from "../../utils/socialMediaAuth";
 import { googleProvider } from "../../utils/provider";
+import defaultPhoto from "../../image/default-profile-photo.png";
 
 function Signin() {
+  const db = firebase.firestore();
+  const userRef = db.collection("users");
   const history = useHistory();
   const [activeItem, setActiveItem] = useState(true); //true = Login、false = Sign Up
+  const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  function saveUserToFirebase(user) {
+    console.log(user);
+    let users = [];
+    userRef.get().then((snapshot) => {
+      snapshot.forEach((user) => {
+        users.push(user.data().uid);
+      });
+      console.log(users);
+      console.log(user.uid);
+      console.log(typeof user.uid);
+      const hasUser = users.includes(user.uid);
+      console.log(hasUser);
+      if (!hasUser) {
+        userRef
+          .doc(user.uid)
+          .set({
+            uid: user.uid,
+            email: user.email,
+            name: user.displayName || "user",
+            photoURL:
+              user.photoURL ||
+              "https://lh3.googleusercontent.com/a/AATXAJwKXgG-Z-dC9Nzz_b5nw5M_HO57C9p4j61PqKfr=s96-c",
+            friend_list: [],
+            user_collection: [],
+          })
+          .then((docRef) => {
+            console.log("Document written with ID: ", docRef.id);
+          })
+          .catch((error) => {
+            console.error("Error adding document: ", error);
+          });
+      }
+    });
+  }
+
   async function socialMediaClick(provider) {
     setIsLoading(true);
     const response = await socialMediaAuth(provider);
+    saveUserToFirebase(response);
     console.log(response);
     setIsLoading(false);
     history.push("/");
@@ -62,9 +102,24 @@ function Signin() {
       firebase
         .auth()
         .createUserWithEmailAndPassword(email, password) //回傳一個promise物件
-        .then(() => {
-          history.push("/");
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log(user);
+
+          // 創建一個新user到firebase firestore
+          userRef.doc(user.uid).set({
+            uid: user.uid,
+            email: user.email,
+            name: displayName || "user",
+            photoURL:
+              user.photoURL ||
+              "https://lh3.googleusercontent.com/a/AATXAJwKXgG-Z-dC9Nzz_b5nw5M_HO57C9p4j61PqKfr=s96-c",
+            friend_list: [],
+            user_collection: [],
+          });
+
           setIsLoading(false);
+          history.push("/");
         })
         .catch((error) => {
           switch (error.code) {
@@ -96,6 +151,17 @@ function Signin() {
             onSubmit(e);
           }}
         >
+          {activeItem ? (
+            <></>
+          ) : (
+            <NameInput
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="Name"
+            />
+          )}
+
           <EmailInput
             type="text"
             value={email}
@@ -136,7 +202,7 @@ const inputStyle = {
   borderRadius: "5px",
   border: "1px solid #ccc",
   padding: "5px 15px",
-  marginTop: "30px",
+  marginBottom: "15px",
   width: "80%",
   height: "35px",
   "&::placeholder": {
@@ -174,12 +240,15 @@ const Error = styled.p`
   font-weight: 300;
   font-size: 14px;
 `;
+const NameInput = styled.input`
+  margin-top: 30px;
+  ${inputStyle}
+`;
 const EmailInput = styled.input`
   ${inputStyle}
 `;
 const PasswordInput = styled.input`
   ${inputStyle}
-  margin-top: 15px;
 `;
 const SubmitBtn = styled.button`
   ${inputStyle}

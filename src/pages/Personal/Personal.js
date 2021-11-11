@@ -77,44 +77,6 @@ function Personal({ uid, userList, myCalendarMovies, calendarMoviesInfo }) {
         console.error(error);
       });
   }
-
-  // watchWith要重新設計！！
-
-  function acceptMovieInvitation(
-    scheduleOwner,
-    invitation_id,
-    doc_id,
-    date,
-    movie_id,
-    watchWith_uid
-  ) {
-    // 刪除電影邀請
-    // movieInviteRef
-    //   .doc(invitation_id)
-    //   .delete()
-    //   .then(() => {
-    //     console.log("movie invite delete");
-    //   });
-
-    console.log(invitation_id);
-    console.log(doc_id);
-    console.log(date);
-    console.log(movie_id);
-    console.log(watchWith_uid);
-
-    // 加入currentUser的calendar
-    const scheduleData = {
-      scheduleOwner,
-      date,
-      doc_id,
-      movie_id,
-      watchWith: [watchWith_uid],
-    };
-    userRef.doc(uid).collection("user_calendar").set(scheduleData);
-
-    // 加入 有參與該電影行程 所有使用者的watchWith
-  }
-
   function canselFriend(friendUid) {
     // 移除朋友邀請
     friendInviteRef
@@ -127,7 +89,74 @@ function Personal({ uid, userList, myCalendarMovies, calendarMoviesInfo }) {
         console.error(error);
       });
   }
+  function cancelMovieInvitation(invitation_id) {
+    // 刪除電影邀請
+    movieInviteRef
+      .doc(invitation_id)
+      .delete()
+      .then(() => {
+        console.log("movie invite delete");
+      });
+    window.alert("cancel the movie invitation");
+  }
+  function acceptMovieInvitation(
+    scheduleOwner,
+    invitation_id,
+    event_doc_id,
+    date,
+    movie_id
+  ) {
+    // 刪除電影邀請
+    movieInviteRef
+      .doc(invitation_id)
+      .delete()
+      .then(() => {
+        console.log("movie invite delete");
+      });
 
+    db.collectionGroup("user_calendar")
+      .where("event_doc_id", "==", event_doc_id)
+      .get()
+      .then((querySnapshot) => {
+        let originWatchWithArr = [];
+
+        // 將currnetUser加入所有人的watchWith
+        querySnapshot.forEach((docRef) => {
+          const docData = docRef.data();
+          originWatchWithArr = [...docData.watchWith];
+          console.log(docData);
+          userRef
+            .doc(docData.uid)
+            .collection("user_calendar")
+            .doc(docData.doc_id)
+            .set({ watchWith: [...docData.watchWith, uid] }, { merge: true });
+          console.log(originWatchWithArr);
+        });
+        // 加入currentUser的calendar
+        const scheduleData = {
+          scheduleOwner,
+          date,
+          event_doc_id,
+          movie_id,
+          watchWith: [...originWatchWithArr, uid],
+          uid: uid,
+        };
+        console.log(`originWatchWithArr`, originWatchWithArr);
+        userRef
+          .doc(uid)
+          .collection("user_calendar")
+          .add(scheduleData)
+          .then((docRef) => {
+            window.alert("Add to Calendar");
+            console.log("Document written with ID: ", docRef.id);
+            userRef
+              .doc(uid)
+              .collection("user_calendar")
+              .doc(docRef.id)
+              .set({ doc_id: docRef.id }, { merge: true });
+          });
+      });
+  }
   function sendFriendInvitation(friendInfo) {
     friendInviteRef.doc(`${uid}-${friendInfo.uid}`).set({
       from: uid,
@@ -135,7 +164,6 @@ function Personal({ uid, userList, myCalendarMovies, calendarMoviesInfo }) {
     });
     window.alert(`you send a friend invitaion to "${friendInfo.name}"`);
   }
-
   function handleSearchFriend(value) {
     const userInfo = userList.find((user) => user.email === value);
     // userInfo ? window.alert(userInfo.name) : window.alert("no user");
@@ -213,12 +241,12 @@ function Personal({ uid, userList, myCalendarMovies, calendarMoviesInfo }) {
             let inviteInfo = {};
             // 獲得date
             // 獲得invitation_id
-            // 獲得doc_id
+            // 獲得event_doc_id
             // 取得userInfo
             // 取得movieInfo
             inviteInfo.date = invite.date;
             inviteInfo.invitation_id = invite.invitation_id;
-            inviteInfo.doc_id = invite.doc_id;
+            inviteInfo.event_doc_id = invite.event_doc_id;
             inviteInfo.userInfo = userList.filter(
               (user) => invite.from === user.uid
             )[0];
@@ -337,16 +365,19 @@ function Personal({ uid, userList, myCalendarMovies, calendarMoviesInfo }) {
                           <Accept
                             onClick={() => {
                               acceptMovieInvitation(
-                                invitation.from,
+                                invitation.userInfo.uid,
                                 invitation.invitation_id,
-                                invitation.doc_id,
+                                invitation.event_doc_id,
                                 invitation.date,
-                                invitation.movieInfo.id,
-                                invitation.userInfo.uid
+                                invitation.movieInfo.id
                               );
                             }}
                           />
-                          <Cansel />
+                          <Cansel
+                            onClick={() => {
+                              cancelMovieInvitation(invitation.invitation_id);
+                            }}
+                          />
                         </IconWrap>
                       </SubContainer>
                     );

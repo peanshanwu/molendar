@@ -25,40 +25,6 @@ function App() {
   const [myCalendarMovies, setMyCalendarMovies] = useState([]); // user_calendar底下所有電影
   const [calendarMoviesInfo, setCalendarMovieInfo] = useState([]); // 根據user_calendar打TMDB回來的電影資料
 
-  function saveUserToFirebase(user) {
-    console.log(user);
-    let users = [];
-    userRef.get().then((snapshot) => {
-      snapshot.forEach((user) => {
-        users.push(user.data().uid);
-      });
-      console.log(users);
-      console.log(uid);
-      const hasUser = users.findIndex((user) => user === uid);
-      console.log(hasUser);
-      if (hasUser === -1) {
-        userRef
-          .doc(user.uid)
-          .set({
-            uid: user.uid,
-            email: user.email,
-            name: user.displayName || "user",
-            photoURL:
-              user.photoURL ||
-              "https://lh3.googleusercontent.com/a/AATXAJwKXgG-Z-dC9Nzz_b5nw5M_HO57C9p4j61PqKfr=s96-c",
-            friend_list: [],
-            user_collection: [],
-          })
-          .then((docRef) => {
-            console.log("Document written with ID: ", docRef.id);
-          })
-          .catch((error) => {
-            console.error("Error adding document: ", error);
-          });
-      }
-    });
-  }
-
   useEffect(() => {
     // 取得使用者資料為非同步
     firebase.auth().onAuthStateChanged((currentUser) => {
@@ -67,13 +33,6 @@ function App() {
       setUid(currentUser.uid);
     });
   }, []);
-
-  useEffect(() => {
-    console.log(user);
-    if (user && uid) {
-      saveUserToFirebase(user);
-    }
-  }, [user, uid]);
 
   useEffect(() => {
     uid &&
