@@ -10,11 +10,9 @@ function getRandomMovie(max) {
   return Math.floor(Math.random() * max);
 }
 
-function Banner({ nowPlayingMovie }) {
+function DetailBanner({ movieDetail }) {
   const [clickTrailer, setClickTrailer] = useState(false);
   const [autoplay, setAutoplay] = useState("");
-  const randomIndex = getRandomMovie(nowPlayingMovie.results.length);
-  const movieData = nowPlayingMovie.results[randomIndex];
 
   function clickPlay() {
     setClickTrailer(true);
@@ -22,7 +20,7 @@ function Banner({ nowPlayingMovie }) {
   }
 
   return (
-    <Wrapper backdrop={movieData.backdrop_path}>
+    <Wrapper backdrop={movieDetail.backdrop_path}>
       <Gradient>
         <Youtube
           style={clickTrailer ? { display: "block" } : { display: "none" }}
@@ -33,15 +31,15 @@ function Banner({ nowPlayingMovie }) {
           allowFullScreen
         />
         <Container>
-          <Link to={`/movie/${movieData.id}`}>
-            <MovieName>{movieData.original_title}</MovieName>
+          <Link to={`/movie/${movieDetail.id}`}>
+            <MovieName>{movieDetail.original_title}</MovieName>
           </Link>
           <StarWrapper>
-            <DisplayStar starPoints={movieData.vote_average} />
+            <DisplayStar starPoints={movieDetail.vote_average} />
           </StarWrapper>
-          <SubInfo>Release Date | {movieData.release_date}</SubInfo>{" "}
-          <SubInfo>Reviews | {movieData.vote_count}</SubInfo>
-          <OverView>{movieData.overview}</OverView>
+          <SubInfo>Release Date | {movieDetail.release_date}</SubInfo>{" "}
+          <SubInfo>Reviews | {movieDetail.vote_count}</SubInfo>
+          <OverView>{movieDetail.overview}</OverView>
           <Trailer onClick={clickPlay}> Watch Trailer</Trailer>
         </Container>
       </Gradient>
@@ -125,4 +123,4 @@ const Youtube = styled.iframe`
   height: 80vh;
 `;
 
-export default Banner;
+export default DetailBanner;
