@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import * as Color from "../../components/layout/Color";
 import { format, isAfter } from "date-fns";
@@ -7,10 +8,13 @@ import { IoHeartCircleSharp } from "react-icons/io5";
 import { BsFillPlayCircleFill } from "react-icons/bs";
 import DisplayStar from "../../components/common/DisplayStar";
 import AddToCalendarIcon from "../../components/common/AddToCalendar";
+import AddToCollection from "../../components/common/AddToCollection";
+import { Waypoint } from "react-waypoint";
+import ReactHover, { Trigger, Hover } from "react-hover";
 
 const posterURL = "https://image.tmdb.org/t/p/w500";
 
-const MovieInfo = ({ uid, selectDay, nowPlayingMovie }) => {
+const MovieInfo = ({ uid, selectDay, nowPlayingMovie, setShowScroll }) => {
   const [clickTrailer, setClickTrailer] = useState(false);
   const [autoplay, setAutoplay] = useState("");
   const [isHoverPoster, setIsHoverPoster] = useState(false);
@@ -34,18 +38,25 @@ const MovieInfo = ({ uid, selectDay, nowPlayingMovie }) => {
     return nowPlaying;
   }
 
-  console.log(uid);
   return (
     <Wrapper>
       {nowPlayingMovie.results.map((result, i) => {
         if (nowIsPlaying(result.release_date)) {
           return (
             <Info>
+              {i === 0 ? (
+                <Waypoint
+                  onLeave={() => {
+                    setShowScroll(false);
+                  }}
+                  onEnter={() => {
+                    setShowScroll(true);
+                  }}
+                />
+              ) : null}
               {/* 還要再寫判斷式去拿到該 movie_id 的 trailer_key */}
-              {/* 還要再寫自動播放的部分 */}
-              {/* 還要再寫將Youtube關掉的按鈕 */}
               {/* 還要再寫infinite scroll */}
-              <Youtube
+              {/* <Youtube
                 style={
                   clickTrailer ? { display: "block" } : { display: "none" }
                 }
@@ -54,8 +65,8 @@ const MovieInfo = ({ uid, selectDay, nowPlayingMovie }) => {
                 frameBorder="0"
                 allow="autoplay; encrypted-media"
                 allowFullScreen
-              />
-              {i === isHoverPoster ? (
+              /> */}
+              {/* {i === isHoverPoster ? (
                 <Trailer
                   id={result.id}
                   onMouseLeave={() => setIsHoverPoster(false)}
@@ -63,22 +74,29 @@ const MovieInfo = ({ uid, selectDay, nowPlayingMovie }) => {
                 >
                   <PlayIcon />
                 </Trailer>
-              ) : null}
-              <Poster
-                src={`${posterURL}${result.poster_path}`}
-                onMouseEnter={() => setIsHoverPoster(i)}
-              />
-              <AddToCalendarIcon
-                uid={uid}
-                selectDay={selectDay}
-                movieId={result.id}
-              />
-              <AddToCollectionIcon />
-              <MovieName>{result.original_title}</MovieName>
+              ) : null} */}
+
+              <Wrap>
+                <Poster
+                  src={`${posterURL}${result.poster_path}`}
+                  onMouseEnter={() => setIsHoverPoster(i)}
+                />
+                <IconWrap>
+                  <AddToCalendarIcon
+                    uid={uid}
+                    selectDay={selectDay}
+                    movieId={result.id}
+                  />
+                  <AddToCollection uid={uid} movieId={result.id} />
+                </IconWrap>
+              </Wrap>
+              <LinkTo to={`/movie/${result.id}`}>
+                <MovieName>{result.original_title}</MovieName>
+              </LinkTo>
               <StarWrapper>
                 <DisplayStar starPoints={result.vote_average} />
               </StarWrapper>
-              <SubInfo>Release Date | {result.release_date}</SubInfo>{" "}
+              <SubInfo>Release Date | {result.release_date}</SubInfo>
               <SubInfo>Reviews | {result.vote_count}</SubInfo>
               <OverView>{result.overview}</OverView>
             </Info>
@@ -90,23 +108,32 @@ const MovieInfo = ({ uid, selectDay, nowPlayingMovie }) => {
 };
 
 const Wrapper = styled.div`
-  /* background-color: ${Color.Background}; */
   position: relative;
-  padding-left: 220px;
   padding-bottom: 150px;
   height: 700px;
   overflow-y: scroll;
   color: white;
+
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 const Info = styled.div`
-  /* border-bottom: 1px solid #ccc; */
   margin-top: 50px;
   padding-bottom: 50px;
   width: 650px;
-  /* outline: 1px solid #ccc; */
-  /* &:last-child {
-    border-bottom: 0 solid white;
-  } */
+`;
+const Wrap = styled.div`
+  display: flex;
+  align-items: flex-end;
+`;
+const IconWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-left: 1%;
 `;
 const Poster = styled.img`
   width: 232px;
@@ -134,17 +161,9 @@ const Youtube = styled.iframe`
   width: 80vw;
   height: 80vh;
 `;
-// const AddToCalendarIcon = styled(IoMdAddCircle)`
-//   color: white;
-//   font-size: 40px;
-//   cursor: pointer;
-//   margin-left: 10px;
-// `;
-const AddToCollectionIcon = styled(IoHeartCircleSharp)`
-  color: white;
-  font-size: 40px;
-  cursor: pointer;
-  margin-left: 10px;
+const LinkTo = styled(Link)`
+  width: 100%;
+  display: inline-block;
 `;
 const MovieName = styled.h2`
   margin-top: 40px;

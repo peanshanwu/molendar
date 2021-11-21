@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import * as Color from "../../components/layout/Color";
-import Slider from "react-slick";
 import { format, isSameDay } from "date-fns";
 import DisplayStar from "../../components/common/DisplayStar";
 import { MdDelete } from "react-icons/md";
 import { FaPen } from "react-icons/fa";
+import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import firebase from "../../utils/firebase";
@@ -21,6 +21,7 @@ function Info({
   userList,
 }) {
   const db = firebase.firestore();
+  const history = useHistory();
   const userRef = db.collection("users");
   const movieRef = db.collection("movie_invitations");
   const settings = {
@@ -117,6 +118,7 @@ function Info({
             .doc(docData.doc_id)
             .delete();
         });
+        setPopupClick(false);
       });
 
     // 邀請刪除
@@ -149,6 +151,7 @@ function Info({
               {selectDayOfMoviesInfo?.map((movie) => {
                 return (
                   <Container backdrop={movie.movieInfo?.backdrop_path}>
+                    {/* <Gradient /> */}
                     <Header>
                       <Day>
                         {format(selectDay, "MM / dd")}
@@ -162,8 +165,6 @@ function Info({
                           </>
                         );
                       })}
-                      {/* ----測試jsx回傳空陣列的話，結論：不會發生任何事 */}
-                      {/* <button>JJJJ{[]}</button> */}
                       {movie.scheduleOwner === uid && (
                         <>
                           <DeleteIcon
@@ -171,9 +172,9 @@ function Info({
                               deleteMovie(movie.event_doc_id);
                             }}
                           />
-                          <Link to={`/edit/${movie.doc_id}`}>
+                          <EditLink to={`/edit/${movie.doc_id}`}>
                             <EditIcon />
-                          </Link>
+                          </EditLink>
                         </>
                       )}
                     </Header>
@@ -189,7 +190,7 @@ function Info({
                       </StarWrapper>
                       <SubInfo>
                         Release Date | {movie.movieInfo.release_date}
-                      </SubInfo>{" "}
+                      </SubInfo>
                       <SubInfo>Reviews | {movie.movieInfo.vote_count}</SubInfo>
                       <OverView>{movie.movieInfo.overview}</OverView>
                     </Wrap>
@@ -208,8 +209,8 @@ const iconStyle = {
   fontSize: "1.9rem",
   color: Color.Main,
   cursor: "pointer",
-  WebkitFilter: "drop-shadow(0 1px 5px rgba(0, 0, 0, 1))",
-  filter: "drop-shadow(0 1px 5px rgba(0, 0, 0, 1))",
+  WebkitFilter: "drop-shadow(0 2px 5px rgba(0, 0, 0, .5))",
+  filter: "drop-shadow(0 2px 5px rgba(0, 0, 0, .5))",
   transition: ".3s ease",
   "&:hover": {
     color: Color.Content,
@@ -228,7 +229,7 @@ const Mask = styled.section`
 `;
 const Wrapper = styled.section`
   color: ${Color.Content};
-  width: 60%;
+  width: 55%;
   position: fixed;
   z-index: 2;
   left: 50%;
@@ -249,15 +250,27 @@ const Container = styled.main`
   height: 500px;
   color: white;
   background-color: ${Color.Background};
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(90deg, ${Color.Background} 10%, transparent);
+  }
 `;
 const Header = styled.div`
-  /* position: fixed;
-  top: 0; */
+  position: relative;
+  top: 0;
   display: flex;
   align-items: center;
+  & * {
+    margin-left: 10px;
+  }
 `;
 const Wrap = styled.section`
-  max-width: 40%;
+  max-width: 50%;
   position: relative;
   top: 50%;
   transform: translateY(-50%);
@@ -276,19 +289,24 @@ const WatchWithPic = styled.div`
   background-repeat: no-repeat;
   background-size: contain;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
+  margin-left: 20px;
 `;
 const WatchWithName = styled.p`
   font-size: 1rem;
+  line-height: 1rem;
   margin-right: auto;
+  margin-top: 14px;
 `;
 const WatchWithOthers = styled.span`
   margin-left: 15px;
   font-size: 1rem;
 `;
 const MovieName = styled.h1`
-  font-size: 3rem;
+  /* word-break: break-all; */
+  word-break: break-word;
+  font-size: 2.5rem;
   width: 100%;
 `;
 const StarWrapper = styled.div`
@@ -305,11 +323,19 @@ const SubInfo = styled.span`
   font-weight: 200;
 `;
 const OverView = styled.p`
+  overflow-y: scroll;
+  height: 150px;
   letter-spacing: 1px;
   margin-top: 30px;
   font-weight: 300;
-  line-height: 24px;
+  line-height: 1.6;
+  /* word-break: break-all; */
+  word-break: break-word;
 `;
+// const IconWrap = styled.div`
+//   display: flex;
+//   justify-content: center;
+// `;
 const DeleteIcon = styled(MdDelete)`
   ${iconStyle};
   margin-left: auto;
@@ -319,5 +345,20 @@ const EditIcon = styled(FaPen)`
   font-size: 1.5rem;
   margin-left: 1rem;
 `;
+const EditLink = styled(Link)`
+  padding-top: 4px;
+  display: inline-block;
+`;
+// const Gradient = styled.div`
+//   /* display: flex; */
+//   /* align-items: center; */
+//   /* padding-top: 150px; */
+//   width: 100%;
 
+//   height: 100%;
+//   /* position: relative;
+//   top: 40%; */
+//   background: linear-gradient(90deg, ${Color.Background} 10%, transparent);
+//   color: ${Color.Content};
+// `;
 export default Info;

@@ -20,37 +20,49 @@ function DetailBanner({ movieDetail }) {
   }
 
   return (
-    <Wrapper backdrop={movieDetail.backdrop_path}>
-      <Gradient>
-        <Youtube
-          style={clickTrailer ? { display: "block" } : { display: "none" }}
-          src={`https://www.youtube.com/embed/jU8VNQKKF-g`}
-          title="YouTube video player"
-          frameBorder="0"
-          allow="autoplay; encrypted-media"
-          allowFullScreen
-        />
-        <Container>
-          <Link to={`/movie/${movieDetail.id}`}>
-            <MovieName>{movieDetail.original_title}</MovieName>
-          </Link>
-          <StarWrapper>
-            <DisplayStar starPoints={movieDetail.vote_average} />
-          </StarWrapper>
-          <SubInfo>Release Date | {movieDetail.release_date}</SubInfo>{" "}
-          <SubInfo>Reviews | {movieDetail.vote_count}</SubInfo>
-          <OverView>{movieDetail.overview}</OverView>
-          <Trailer onClick={clickPlay}> Watch Trailer</Trailer>
-        </Container>
-      </Gradient>
-    </Wrapper>
+    <>
+      <Mask
+        style={clickTrailer ? { display: "block" } : { display: "none" }}
+        onClick={() => {
+          setClickTrailer(false);
+        }}
+      />
+      <Wrapper backdrop={movieDetail.backdrop_path}>
+        <Gradient>
+          {clickTrailer ? (
+            <Youtube
+              // style={clickTrailer ? { display: "block" } : { display: "none" }}
+              src={`https://www.youtube.com/embed/${movieDetail.videos.results[0].key}`}
+              title="YouTube video player"
+              frameBorder="0"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+            />
+          ) : null}
+          <Container>
+            <Link to={`/movie/${movieDetail.id}`}>
+              <MovieName>{movieDetail.original_title}</MovieName>
+            </Link>
+            <StarWrapper>
+              <DisplayStar starPoints={movieDetail.vote_average} />
+            </StarWrapper>
+            <SubInfo>Release Date | {movieDetail.release_date}</SubInfo>{" "}
+            <SubInfo>Reviews | {movieDetail.vote_count}</SubInfo>
+            <OverView>{movieDetail.overview}</OverView>
+            <Trailer onClick={clickPlay}> Watch Trailer</Trailer>
+          </Container>
+        </Gradient>
+      </Wrapper>
+    </>
   );
 }
 
 const Wrapper = styled.section`
   background-image: url(https://image.tmdb.org/t/p/w1280/${(props) =>
     props.backdrop});
+  /* background-size: contain; */
   background-size: cover;
+  /* background-position: 100% 0; */
   background-position-x: 20vw;
   background-repeat: no-repeat;
   position: relative;
@@ -63,7 +75,7 @@ const Gradient = styled.div`
   align-items: center;
   width: 100%;
   height: 100%;
-  padding-left: 220px;
+  padding-left: 160px;
   background: linear-gradient(90deg, ${Color.Background} 20%, transparent);
   color: ${Color.Content};
 `;
@@ -121,6 +133,13 @@ const Youtube = styled.iframe`
   z-index: 999;
   width: 80vw;
   height: 80vh;
+`;
+const Mask = styled.div`
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  background-color: rgba(0, 0, 0, 0.8);
 `;
 
 export default DetailBanner;

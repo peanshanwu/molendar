@@ -1,65 +1,60 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { fetchSearch } from "../../utils/api";
 import * as Color from "../../components/layout/Color";
-import { fetchCollectionMovies } from "../../utils/api";
-import CollectionItem from "./CollectionItem";
-import { Title } from "../../components/layout/Tilte";
-// redux
-import { useSelector } from "react-redux";
+import DisplayStar from "../../components/common/DisplayStar";
 
-export default function Collection({ uid }) {
-  // const history = useHistory();
-  // if (uid === null) {
-  //   // window.alert("please Login first, thank you");
-  //   history.push("/");
-  // }
+export default function MovieList() {
+  const { query } = useParams();
+  const [searchInfo, setSearchInfo] = useState();
 
-  const [collectionInfo, setCollectionInfo] = useState();
-  const currentUserInfo = useSelector((state) => state.currentUserInfo);
+  console.log(query);
+  console.log(searchInfo);
 
   useEffect(() => {
     let isMounted = true;
     if (isMounted) {
-      currentUserInfo &&
-        fetchCollectionMovies(currentUserInfo.user_collection).then(
-          (movieInfo) => {
-            console.log(`movieInfo`, movieInfo);
-            setCollectionInfo(movieInfo);
-          }
-        );
+      fetchSearch(query).then((res) => {
+        setSearchInfo(res);
+      });
     }
     return () => {
       isMounted = false;
     };
-  }, [currentUserInfo]);
-
-  console.log(collectionInfo);
+  }, [query]);
 
   return (
     <Wrapper>
       <Main>
         <Container>
-          <Title>Collections</Title>
-          {collectionInfo?.length > 0 ? (
+          {searchInfo?.results.length > 0 ? (
             <FlexWrap>
-              {collectionInfo.map((result) => {
+              {searchInfo.results.map((result) => {
                 const url = result.poster_path
                   ? `https://image.tmdb.org/t/p/w500${result.poster_path}`
                   : `https://firebasestorage.googleapis.com/v0/b/molendar-shan.appspot.com/o/default_photo.png?alt=media&token=376c66cd-730d-44b7-a2f1-347999a60c02`;
 
                 return (
-                  <CollectionItem
-                    url={url}
-                    result={result}
-                    uid={currentUserInfo.uid}
-                  />
+                  <Movie>
+                    <Link to={`/movie/${result.id}`}>
+                      <Poster
+                        src={url}
+                        key={result.id}
+                        alt={result.original_title}
+                      />
+                      <MovieName>{result.original_title}</MovieName>
+                      <StarWrapper>
+                        <DisplayStar starPoints={result.vote_average} />
+                      </StarWrapper>
+                    </Link>
+                  </Movie>
                 );
               })}
             </FlexWrap>
           ) : (
             <NoItem>
-              Sorry, you don't have collection <span> ...</span>
+              Sorry, no result found <span> ...</span>
               <Link to={`/`}> | Back to index</Link>
             </NoItem>
           )}
@@ -104,4 +99,29 @@ const FlexWrap = styled.div`
   flex-wrap: wrap;
   justify-content: flex-start;
   gap: 10vh 5.7%;
+`;
+const Movie = styled.div`
+  /* padding-top: 30px; */
+  width: 20.5%;
+  /* height: 400px; */
+`;
+const MovieName = styled.h3`
+  margin-top: 10px;
+  font-weight: 100;
+`;
+const Poster = styled.img`
+  object-fit: cover;
+  height: auto;
+  transform-origin: center;
+  transition: ease-in 0.3s;
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+const StarWrapper = styled.div`
+  color: ${Color.Main};
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 5px;
 `;

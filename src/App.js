@@ -6,6 +6,7 @@ import Index from "./pages/Index/Index";
 import Personal from "./pages/Personal/Personal";
 import Signin from "./pages/Signin/Signin";
 import Movie from "./pages/Movie/Movie";
+import MovieList from "./pages/MovieList/MovieList";
 import Edit from "./pages/Personal/Edit";
 import Collection from "./pages/Collection/Collection";
 import Search from "./components/layout/Search";
@@ -15,12 +16,16 @@ import Logo from "./components/layout/Logo";
 import firebase from "./utils/firebase";
 import { fetchMultiMovies } from "./utils/api";
 
+// redux
+import { useDispatch } from "react-redux";
+import { getCurrentUserInfo } from "./redux/action";
+
 function App() {
+  const dispatch = useDispatch();
   const db = firebase.firestore();
   const userRef = db.collection("users");
   const [uid, setUid] = useState(null); //儲存uid，要改成redux
   const [user, setUser] = useState(null); //儲存uid，要改成redux
-  const [currentUserInfo, setCurrentUserInfo] = useState(null);
   const [userList, setUserList] = useState([]); // 所有user的資料
   const [myCalendarMovies, setMyCalendarMovies] = useState([]); // user_calendar底下所有電影
   const [calendarMoviesInfo, setCalendarMovieInfo] = useState([]); // 根據user_calendar打TMDB回來的電影資料
@@ -30,25 +35,40 @@ function App() {
     firebase.auth().onAuthStateChanged((currentUser) => {
       console.log("onAuthStateChanged 回傳", currentUser);
       setUser(currentUser);
-      setUid(currentUser.uid);
+      // setUid(currentUser.uid);
+
+      if (currentUser) {
+        setUid(currentUser.uid);
+      } else {
+        setUid(null);
+      }
     });
   }, []);
 
   useEffect(() => {
     uid &&
-      userRef
-        .doc(uid)
-        .get()
-        .then((doc) => {
-          return doc.data();
-        })
-        .then((data) => {
-          setCurrentUserInfo(data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      userRef.doc(uid).onSnapshot((doc) => {
+        console.log(doc.data());
+        // setCurrentUserInfo(doc.data());
+        dispatch(getCurrentUserInfo(doc.data()));
+      });
   }, [uid]);
+
+  // useEffect(() => {
+  //   uid &&
+  //     userRef
+  //       .doc(uid)
+  //       .get()
+  //       .then((doc) => {
+  //         return doc.data();
+  //       })
+  //       .then((data) => {
+  //         setCurrentUserInfo(data);
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  // }, [uid]);
 
   useEffect(() => {
     let isMounted = true;
@@ -75,24 +95,39 @@ function App() {
   }, [uid]);
 
   useEffect(() => {
-    uid &&
-      userRef
-        .get()
-        .then((snapshot) => {
-          let userArr = [];
-          snapshot.docs.forEach((user) => {
-            userArr.push(user.data());
-          });
-          setUserList(userArr);
-        })
-        .catch((err) => {
-          console.log(err);
+    userRef
+      .get()
+      .then((snapshot) => {
+        let userArr = [];
+        snapshot.docs.forEach((user) => {
+          console.log(user.data());
+          userArr.push(user.data());
         });
-  }, [uid]);
+        setUserList(userArr);
+      })
+      .catch((err) => {
+        console.err(err);
+      });
+  }, []);
+
+  // useEffect(() => {
+  //   uid &&
+  //     userRef
+  //       .get()
+  //       .then((snapshot) => {
+  //         let userArr = [];
+  //         snapshot.docs.forEach((user) => {
+  //           userArr.push(user.data());
+  //         });
+  //         setUserList(userArr);
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  // }, [uid]);
 
   return (
     <Router>
-      {/* <Search /> */}
       <Header user={user} />
       <Logo />
       <Switch>
@@ -108,25 +143,25 @@ function App() {
           />
         </Route>
         <Route exact path="/signin">
-          <Signin />
+          <Signin uid={uid} />
         </Route>
         <Route exact path="/collection">
           <Collection />
         </Route>
         <Route exact path="/movie/:id">
-          <Movie />
+          <Movie uid={uid} userList={userList} />
         </Route>
-        <Route exact path="/edit/:schedulId">
+        <Route exact path="/movieList/:query">
+          <MovieList />
+        </Route>
+        <Route exact path="/edit/:event_doc_id">
           <Edit
             uid={uid}
-            currentUserInfo={currentUserInfo}
             userList={userList}
             myCalendarMovies={myCalendarMovies}
             calendarMoviesInfo={calendarMoviesInfo}
           />
         </Route>
-        {/* <Route path="/" exact compnent={Index} /> */}
-        {/* <Route path="/movie/" compnent={Movie} /> */}
       </Switch>
       <Footer />
     </Router>

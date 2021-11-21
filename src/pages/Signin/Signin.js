@@ -14,12 +14,16 @@ import firebase from "../../utils/firebase";
 import "firebase/auth";
 import socialMediaAuth from "../../utils/socialMediaAuth";
 import { googleProvider } from "../../utils/provider";
-import defaultPhoto from "../../image/default-profile-photo.png";
 
-function Signin() {
+function Signin({ uid }) {
+  //如果登入過，導到個人頁
+  const history = useHistory();
+  if (uid) {
+    history.push("/personal");
+  }
+
   const db = firebase.firestore();
   const userRef = db.collection("users");
-  const history = useHistory();
   const [activeItem, setActiveItem] = useState(true); //true = Login、false = Sign Up
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -113,7 +117,7 @@ function Signin() {
             name: displayName || "user",
             photoURL:
               user.photoURL ||
-              "https://lh3.googleusercontent.com/a/AATXAJwKXgG-Z-dC9Nzz_b5nw5M_HO57C9p4j61PqKfr=s96-c",
+              "https://firebasestorage.googleapis.com/v0/b/molendar-shan.appspot.com/o/default-profile-photo.png?alt=media&token=1ffd5707-231b-484e-9a3b-1d1105eb4141",
             friend_list: [],
             user_collection: [],
           });
