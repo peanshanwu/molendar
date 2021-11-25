@@ -14,20 +14,16 @@ function Logo() {
 
 }
 
-export default Logo
-
 const LinkTo = styled(Link)`
   position: fixed;
-  top: 0;
-  right: 0;
+  top: -1px;
+  right: -1px;
   z-index: 3;
 `
 const LogoIcon = styled.img`
   width: 60px;
   height: 60px;
-  transition: ease-in-out .3s;
   cursor: pointer;
-  /* &:hover {
-    box-shadow: 0 0 30px rgba(0, 204, 204, .5);
-  } */
 `
+
+export default Logo

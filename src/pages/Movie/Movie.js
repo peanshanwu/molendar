@@ -2,36 +2,81 @@ import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import * as Color from "../../components/layout/Color";
 import styled from "styled-components";
-import DisplayStar from "../../components/common/DisplayStar";
-import { ImCross } from "react-icons/im";
-import EasyEdit, { Types } from "react-easy-edit";
 import Loading from "../../components/layout/Loading";
+import firebase from "../../utils/firebase";
+import Comment from "./Comment";
+import LoginFirst from "./LoginFirst";
+import Banner from "../../components/common/Banner"
+import WriteComment from "./WriteComment";
 import DetailBanner from "./DetailBanner";
-import { fetchMovie } from "../../utils/api";
+import DetailCarousel from "./DetailCarousel";
+import { fetchMovie, fetchCast } from "../../utils/api";
+import AddToCalendarIcon from "../../components/common/AddToCalendar";
+import AddToCollection from "../../components/common/AddToCollection";
+import * as Title from "../../components/layout/Title";
+import { Main, MaxWidthContainer } from "../../components/layout/Container"
+import MovieIntro from "./MovieIntro"
+import * as BreakPoint from "../../components/layout/BreakPoints"
 
-// react-easy-edit
-// const CustomDisplay = (props) => {
-//   const val = props.value || "redlohecalp motsuC";
-//   return <div>{val.split("").reverse().join("")}</div>;
-// };
+// const isoConv = require("iso-language-converter");
 
-function Movie({}) {
-  const [movieDetail, setMovieDetail] = useState();
+function Movie({ uid, userList }) {
   const { id } = useParams();
+  const [movieDetail, setMovieDetail] = useState();
+  const [castInfo, setCastInfo] = useState();
 
-  // react-easy-edit
-  const save = (value) => {
-    alert(value);
-  };
-  const cancel = () => {
-    alert("Cancelled");
-  };
+  const db = firebase.firestore();
+  const commentRef = db.collection("user_comments");
+  const [commentInfo, setCommentInfo] = useState(null);
+
+  // comment state
+  useEffect(() => {
+    commentRef
+      .doc(id)
+      .collection("comments")
+      .onSnapshot((snapshot) => {
+        let commentsArr = [];
+
+        // 時間排序
+        let arr = [];
+        snapshot.forEach((docRef) => {
+          arr.push(docRef.data());
+        });
+        arr.sort((a, b) => {
+          return a.time < b.time ? 1 : -1;
+          // 1: b排序在a前（新到舊)
+          // -1: a排序在b前(舊到新)
+        });
+
+        // 做成obj
+        arr.forEach((comment) => {
+          let obj = {};
+          obj.commentInfo = comment;
+          obj.userInfo = userList.find((user) => user.uid === comment.uid);
+          commentsArr.push(obj);
+        });
+
+        console.log(`commentsArr`, commentsArr);
+        setCommentInfo(commentsArr);
+      });
+  }, [userList]);
+
+  useEffect(() => {
+    let isMount = true;
+    if (isMount) {
+      fetchCast(id).then((res) => {
+        setCastInfo(res);
+      });
+    }
+    return () => {
+      isMount = false; // 清除fetchAPI
+    };
+  }, []);
 
   useEffect(() => {
     let isMount = true;
     if (isMount) {
       fetchMovie(id).then((res) => {
-        console.log(res);
         setMovieDetail(res);
       });
     }
@@ -40,93 +85,107 @@ function Movie({}) {
     };
   }, []);
 
+  // const posterURL = movieDetail?.poster_path
+  //   ? `https://image.tmdb.org/t/p/w500${movieDetail.poster_path}`
+  //   : `https://firebasestorage.googleapis.com/v0/b/molendar-shan.appspot.com/o/default_photo.png?alt=media&token=376c66cd-730d-44b7-a2f1-347999a60c02`;
+
+  // function getGenres() {
+  //   let genresArr = [];
+  //   if (movieDetail) {
+  //     movieDetail.genres.forEach((genres) => {
+  //       genresArr.push(genres.name);
+  //     });
+  //   }
+  //   return genresArr;
+  // }
+
+  // function getProduction() {
+  //   let productArr = [];
+  //   if (movieDetail) {
+  //     movieDetail.production_companies.forEach((product) => {
+  //       productArr.push(product.name);
+  //     });
+  //   }
+  //   return productArr;
+  // }
+
+  // function timeConvert(n) {
+  //   var num = n;
+  //   var hours = num / 60;
+  //   var rhours = Math.floor(hours);
+  //   var minutes = (hours - rhours) * 60;
+  //   var rminutes = Math.round(minutes);
+  //   return `${rhours}h ${rminutes}min`;
+  // }
+
+  // function findDirector() {
+  //   let directorName = "";
+  //   castInfo.crew.forEach((crew) => {
+  //     if (crew.job === "Director") {
+  //       directorName = crew.name;
+  //     }
+  //   });
+  //   return directorName;
+  // }
+  
   return (
     <>
-      {movieDetail && (
-        <Wrapper>
-          <Main>
-            <DetailBanner movieDetail={movieDetail} />
+      {movieDetail && castInfo && (
+        <Main>
+          <Banner movieData={movieDetail} />
+          <IconWrap>
+            <AddToCalendarIcon
+              uid={uid}
+              selectDay={new Date()}
+              movieId={parseInt(id, 10)}
+            />
+            <AddToCollection uid={uid} movieId={parseInt(id, 10)} />
+          </IconWrap>
+          <Wrap>
             <Container>
-              <InfoWrap>
-                <Poster
-                  src={`https://image.tmdb.org/t/p/w500${movieDetail.poster_path}`}
-                ></Poster>
-                <ContentWrap>
-                  <Storyline>Storyline</Storyline>
-                  <StorylineInfo>{movieDetail.overview}</StorylineInfo>
-                  <Wrap1>
-                    <Wrap2>
-                      <DetailTitle>Released</DetailTitle>
-                      <DetailContent>11 August 2021</DetailContent>
-                    </Wrap2>
-                    <Wrap2>
-                      <DetailTitle>Runtime</DetailTitle>
-                      <DetailContent>1h 55min</DetailContent>
-                    </Wrap2>
-                    <Wrap2>
-                      <DetailTitle>Director</DetailTitle>
-                      <DetailContent> Shawn Levy</DetailContent>
-                    </Wrap2>
-                    <Wrap2>
-                      <DetailTitle>Genre</DetailTitle>
-                      <DetailContent>
-                        Comedy, Action, Adventure, Science Fiction
-                      </DetailContent>
-                    </Wrap2>
-                    <Wrap2>
-                      <DetailTitle>Status</DetailTitle>
-                      <DetailContent>Released</DetailContent>
-                    </Wrap2>
-                    <Wrap2>
-                      <DetailTitle>Language</DetailTitle>
-                      <DetailContent>English</DetailContent>
-                    </Wrap2>
-                    <Wrap2>
-                      <DetailTitle>Production </DetailTitle>
-                      <DetailContent>
-                        Berlanti Productions, 21 Laps Entertainment, Maximum
-                        Effort, Lit Entertainment Group
-                      </DetailContent>
-                    </Wrap2>
-                  </Wrap1>
-                </ContentWrap>
-              </InfoWrap>
+              <MovieIntro movieDetail={movieDetail} castInfo={castInfo}/>
             </Container>
-          </Main>
-        </Wrapper>
+          </Wrap>
+          <DetailCarousel castInfo={castInfo} />
+          <Wrap>
+            <Container>
+              <Title.Sub>All Comments</Title.Sub>
+              {uid ? <WriteComment id={id} uid={uid} /> : <LoginFirst />}
+              {commentInfo &&
+                commentInfo.map((info) => {
+                  return <Comment info={info} uid={uid} id={id} />;
+                })}
+            </Container>
+          </Wrap>
+        </Main>
       )}
     </>
   );
 }
-const iconStyle = {
-  fontSize: "1.5rem",
-  color: Color.Main,
-  cursor: "pointer",
-  transition: ".3s ease",
-  "&:hover": {
-    color: Color.Content,
-    WebkitFilter: "drop-shadow(0 0 5px rgba(0, 204, 204, 1))",
-    filter: "drop-shadow(0 0 5px rgba(0, 204, 204, 1))",
-  },
-};
-const Wrapper = styled.section`
-  color: ${Color.Content};
-  position: relative;
+
+const IconWrap = styled.div`
+  width: 60px;
+  position: fixed;
+  z-index: 1;
+  top: 70px;
+  right: 0;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  & svg {
+    margin-bottom: 10px;
+  }
+`;
+const Wrap = styled.section`
+  padding: 50px 8rem;
   width: 100%;
-  background-color: ${Color.Background};
-`;
-const Main = styled.main`
-  width: calc(100% - 80px);
-  position: relative;
-  left: 80px;
-`;
-const Container = styled.div`
+  @media (max-width: ${BreakPoint.md}) {
+    padding: 50px 2rem;
+  }
+`
+const Container = styled(MaxWidthContainer)`
   word-break: break-all;
-  max-width: 1000px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 100px 0;
-  /* outline: 1px solid gray; */
+  color: ${Color.Content};
 `;
 const InfoWrap = styled.div`
   display: flex;
@@ -162,44 +221,6 @@ const DetailTitle = styled.h6`
 `;
 const DetailContent = styled.p`
   width: 80%;
-`;
-const Title = styled.h1`
-  font-size: 2rem;
-  margin-bottom: 20px;
-`;
-const MovieName = styled.h2`
-  font-size: 2rem;
-`;
-const EditWrap = styled.div`
-  width: 80%;
-  /* height: 300px; */
-  max-height: 300px;
-  overflow-y: scroll;
-  /* background-color: ${Color.Light}; */
-`;
-const CommentWrap = styled.div`
-  width: 100%;
-  /* height: 500px; */
-  background-color: ${Color.Sub};
-  margin-bottom: 50px;
-  display: flex;
-  position: relative;
-`;
-const IconWrap = styled.div`
-  position: absolute;
-  top: 20px;
-  right: 20px;
-`;
-const Cansel = styled(ImCross)`
-  ${iconStyle}
-  font-size: 1.25rem;
-`;
-const StarWrapper = styled.div`
-  color: ${Color.Main};
-  display: flex;
-  flex-wrap: wrap;
-  margin-left: 15px;
-  font-size: 20px;
 `;
 
 export default Movie;

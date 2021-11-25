@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { useHistory, useParams } from "react-router-dom";
 import * as Color from "../../components/layout/Color";
 import background from "../../image/index-calendar-bg.png";
-import Loading from "../../components/layout/Loading";
 import { BsFillPeopleFill } from "react-icons/bs";
 import { IoMdRemoveCircle } from "react-icons/io";
 import { MdPersonAddAlt1, MdAddCircle } from "react-icons/md";
@@ -11,14 +10,15 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import firebase from "../../utils/firebase";
 import { format } from "date-fns";
+import swal from "sweetalert";
+import { Main } from "../../components/layout/Container"
+// import * as Title from "../../components/layout/Title"
+import * as BreakPoint from "../../components/layout/BreakPoints"
+// redux
+import { useSelector } from "react-redux";
 
-function Edit({
-  uid,
-  // currentUserInfo,
-  myCalendarMovies,
-  userList,
-  calendarMoviesInfo,
-}) {
+function Edit({ uid, myCalendarMovies, userList, calendarMoviesInfo }) {
+  const currentUserInfo = useSelector((state) => state.currentUserInfo);
   const history = useHistory();
   const db = firebase.firestore();
   const userRef = db.collection("users");
@@ -30,24 +30,8 @@ function Edit({
   const [friendListInfo, setFriendListInfo] = useState([]);
   const [inviteInfo, setInviteInfo] = useState([]);
   const [removeWatchWithUid, setRemoveWatchWithUid] = useState([]);
-  const [removeInviteUid, setRemoveInviteUid] = useState([]);
-  const [addInviteUid, setAddInviteUid] = useState([]);
-  const [currentUserInfo, setCurrnetUserInfo] = useState([]);
   // const { id } = useParams();
-  const paramId = useParams().schedulId;
-
-  // 對currentUser的doc作監聽
-  useEffect(() => {
-    if (uid) {
-      const unsubscribe = userRef.doc(uid).onSnapshot((doc) => {
-        console.log(doc.data());
-        setCurrnetUserInfo(doc.data());
-      });
-      return () => {
-        unsubscribe();
-      };
-    }
-  }, [uid]);
+  const paramId = useParams().event_doc_id;
 
   // 設定scheduleInfo state
   useEffect(() => {
@@ -64,12 +48,12 @@ function Edit({
   useEffect(() => {
     if (currentUserInfo) {
       movieInviteRef
-        .where("from", "==", uid)
-        .where("doc_id", "==", paramId)
+        .where("event_doc_id", "==", paramId)
         .onSnapshot((querySnapshot) => {
+          console.log(querySnapshot.docs);
           var inviteIdArr = [];
-          querySnapshot.forEach((doc) => {
-            inviteIdArr.push(doc.data().to);
+          querySnapshot.forEach((docRef) => {
+            inviteIdArr.push(docRef.data().to);
           });
           setInviteInfo(
             userList.filter((userInfo) => inviteIdArr.includes(userInfo.uid))
@@ -143,9 +127,6 @@ function Edit({
         .get()
         .then((querySnapshot) => {
           querySnapshot.forEach((docRef) => {
-            console.log(docRef.data().uid);
-            console.log(docRef.data());
-            console.log(docRef.data().doc_id);
             userRef
               .doc(docRef.data().uid)
               .collection("user_calendar")
@@ -155,36 +136,78 @@ function Edit({
         });
     }
   }
-  function saveRemoveWatchwith() {
+
+  function removeWatchWithSchedule() {
     if (removeWatchWithUid.length > 0) {
-      removeWatchWithUid.forEach((removeUid) => {
-        db.collectionGroup("user_calendar")
-          .where("event_doc_id", "==", paramId)
-          .get()
-          .then((querySnapshot) => {
-            querySnapshot.forEach((docRef) => {
-              userRef
-                .doc(removeUid)
-                .collection("user_calendar")
-                .doc(docRef.data().doc_id)
-                .delete()
-                .then(() => {
-                  console.log(`delete${removeUid}`);
-                })
-                .catch((err) => {
-                  console.log(err);
-                });
+      // 目的：刪除被移除者的電影行程
+
+      // 先篩選出所有參與者的行程doc
+      db.collectionGroup("user_calendar")
+        .where("event_doc_id", "==", paramId)
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((docRef) => {
+            const docData = docRef.data();
+            console.log(docRef.data());
+            // 比對是否符合removeWatchWithUid的uid
+            removeWatchWithUid.forEach((removeUid) => {
+              if (removeUid === docData.uid) {
+                // 若是，刪除該行程
+                userRef
+                  .doc(removeUid)
+                  .collection("user_calendar")
+                  .doc(docData.doc_id)
+                  .delete();
+              }
             });
           });
-      });
+        });
     }
   }
-  function changeInvitation() {
-    movieInviteRef.where("");
+  function changeInvitation(selectDateData) {
+    movieInviteRef
+      .where("event_doc_id", "==", paramId)
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((docRef) => {
+          const docData = docRef.data();
+          movieInviteRef
+            .doc(docData.invitation_id)
+            .update({ date: selectDateData });
+        });
+      });
   }
 
+  function sendInvitation(inviteUid, selectDateData) {
+    console.log(selectDateData);
+    console.log(paramId);
+    console.log(uid);
+    console.log(scheduleInfo.movie_id);
+    const data = {
+      date: selectDateData,
+      event_doc_id: paramId,
+      from: uid,
+      to: inviteUid,
+      movie_id: scheduleInfo.movie_id,
+      sendTime: firebase.firestore.Timestamp.fromDate(new Date()),
+    };
+    movieInviteRef
+      .add(data)
+      .then((docRef) => {
+        movieInviteRef
+          .doc(docRef.id)
+          .set({ invitation_id: docRef.id }, { merge: true });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+  function deleteInvitation(invitation_id) {
+    movieInviteRef.doc(invitation_id).delete();
+  }
   function editSave() {
     // 先統一轉好資料
+    const movieInviteData = [...inviteInfo.map((invitation) => invitation.uid)];
     const selectDateData = format(selectDate, "yyyy-MM-dd")
       .split("-")
       .map((e) => e);
@@ -193,212 +216,175 @@ function Edit({
       ...watchWithInfo.map((watchWith) => watchWith.uid),
     ];
 
-    console.log(watchWithData);
-
     changeSchedule(watchWithData, selectDateData); // selectDate、watchWith更改：每個參與者的行程更改
-    saveRemoveWatchwith(); // 處理watchWith，刪除被移除者的電影行程（之後擴充加上通知被移除者）
-
-    // !!! start from here !!!
-    // changeInvitation() // selecDate更改：正在邀請中的invitation也要更改
+    removeWatchWithSchedule(); // 處理watchWith，刪除被移除者的電影行程（之後擴充加上通知被移除者）
+    changeInvitation(selectDateData); // selecDate更改：正在邀請中的invitation也要更改
 
     // 處理invitation --------------------------------------------------------------------------------------------
-    /*
-    儲存remove或add item 的 Uid array不可行
-    如果重複操作，即使挑出重複的
-    到最後會變成add array也有該id，remove array也有
-    要改成，根據最終state，去比對firebase上的源頭資料，有重複的不做事／原本有後來沒了要刪除邀請／原本沒有後來有要傳送邀請
-    */
 
-    // - 刪除
-    if (removeInviteUid.length > 0) {
-      // 先剔除因使用者重複操作，可能造成重複的uid (X)
-      const filtedRemoveInviteUid = removeInviteUid.filter(function (
-        element,
-        index,
-        arr
-      ) {
-        return arr.indexOf(element) === index;
+    // 比對
+    movieInviteRef
+      .where("event_doc_id", "==", paramId)
+      .get()
+      .then((querySnapshot) => {
+        // 原始firebase無、最終state有｜ 新增邀請
+        movieInviteData.forEach((invite) => {
+          const originToArr = [];
+          querySnapshot.forEach((docRef) => originToArr.push(docRef.data().to));
+          // const originToArr = querySnapshot.docs.map(
+          //   (docRef) => docRef.data().to
+          // );
+          // querySnapShot.docs是一個array，可以使用array方法，裡面包著一個特殊的東西，可以用data()
+          if (!originToArr.includes(invite)) {
+            sendInvitation(invite, selectDateData);
+          }
+        });
+
+        // 原始firebase有、最終state無｜ 刪除邀請
+        querySnapshot.forEach((docRef) => {
+          const docData = docRef.data();
+          console.log(movieInviteData);
+          console.log(docData);
+
+          if (!movieInviteData.includes(docData.to)) {
+            deleteInvitation(docData.invitation_id);
+          }
+        });
       });
-      console.log(`filtedRemoveInviteUid`, filtedRemoveInviteUid);
-      filtedRemoveInviteUid.forEach((removeUid) => {
-        movieInviteRef
-          .where("to", "==", removeUid)
-          .where("doc_id", "==", paramId)
-          .onSnapshot((querySnapshot) => {
-            querySnapshot.forEach((docRef) => {
-              // 根據該id把movieInvitation的doc刪除
-              movieInviteRef
-                .doc(docRef.id)
-                .delete()
-                .then(() => {
-                  console.log("delete!!");
-                })
-                .catch((err) => {
-                  console.log(err);
-                });
-            });
-          });
-      });
-    }
-    // -新增;
-    if (addInviteUid.length > 0) {
-      // 先剔除因使用者重複操作，可能造成重複的uid (X)
-      const filtedAddInviteUid = addInviteUid.filter(function (
-        element,
-        index,
-        arr
-      ) {
-        return arr.indexOf(element) === index;
-      });
-      console.log(`filtedAddInviteUid`, filtedAddInviteUid);
-      filtedAddInviteUid.forEach((addUid) => {
-        const data = {
-          date: selectDateData,
-          // doc_id: paramId,
-          event_doc_id: paramId,
-          from: uid,
-          to: addUid,
-          movie_id: scheduleInfo.movie_id,
-          sendTime: firebase.firestore.Timestamp.fromDate(new Date()),
-        };
-        movieInviteRef
-          .add(data)
-          .then((docRef) => {
-            movieInviteRef
-              .doc(docRef.id)
-              .set({ invitation_id: docRef.id }, { merge: true });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      });
-    }
 
     history.push("/personal");
   }
-
   function removeWatchwith(removeUid) {
-    if (window.confirm("Do you really want to delete?")) {
-      setWatchWithInfo(
-        watchWithInfo.filter((watchWith) => removeUid !== watchWith.uid)
-      );
-      const removeItemInfo = userList.find(
-        (userInfo) => userInfo.uid === removeUid
-      );
-      setFriendListInfo((friendList) => [...friendList, removeItemInfo]);
-      // (X)
-      setRemoveWatchWithUid((removeWatchWithUid) => [
-        ...removeWatchWithUid,
-        removeUid,
-      ]);
-    } else {
-      return;
-    }
+    swal({
+      title: `Do you really want to remove?`,
+      text: `once you click ok, you have to send a invitation again`,
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    }).then((willDelete) => {
+      if (willDelete) {
+        setWatchWithInfo(
+          watchWithInfo.filter((watchWith) => removeUid !== watchWith.uid)
+        );
+        const removeItemInfo = userList.find(
+          (userInfo) => userInfo.uid === removeUid
+        );
+        setFriendListInfo((friendList) => [...friendList, removeItemInfo]);
+        setRemoveWatchWithUid((removeWatchWithUid) => [
+          ...removeWatchWithUid,
+          removeUid,
+        ]);
+        swal(`Deleted!`, {
+          icon: "success",
+          button: false,
+          timer: 1500,
+        });
+      } else {
+        swal("Mmm...Maybe next time!", {
+          button: false,
+          timer: 1500,
+        });
+      }
+    });
   }
-
   function removeInvite(removeUid) {
-    if (window.confirm("Do you really want to delete?")) {
-      setInviteInfo(inviteInfo.filter((invite) => removeUid !== invite.uid));
-      const removeItemInfo = userList.find(
-        (userInfo) => userInfo.uid === removeUid
-      );
-      setFriendListInfo((friendList) => [...friendList, removeItemInfo]);
-
-      // (X)
-      //save時，可根據這個removeInviteUidstate，來做邀請刪除 或 傳送邀請（如果重複操作，陣列會有重複uid，在save時需再做一次篩掉重複）
-      setRemoveInviteUid((removeInviteUid) => [...removeInviteUid, removeUid]);
-    } else {
-      return;
-    }
+    swal(
+      "Remove the movie invitation",
+      `once you save, it will remove the invitation`,
+      "info",
+      { buttons: false, timer: 2500 }
+    );
+    setInviteInfo(inviteInfo.filter((invite) => removeUid !== invite.uid));
+    const removeItemInfo = userList.find(
+      (userInfo) => userInfo.uid === removeUid
+    );
+    setFriendListInfo((friendList) => [...friendList, removeItemInfo]);
   }
-  console.log(`RemoveInviteUid`, removeInviteUid);
 
   function sendWatchInvitation(uid) {
-    if (window.confirm("Send watch movie request?")) {
-      const userInfo = userList.find((user) => user.uid === uid);
-      setInviteInfo((inviteInfo) => [...inviteInfo, userInfo]);
-      setFriendListInfo(
-        friendListInfo.filter((friend) => !(uid === friend.uid))
-      );
-      setAddInviteUid((addInviteUid) => [...addInviteUid, uid]); //save時，可根據這個state，來做邀請刪除 或 傳送邀請
-    } else {
-      return;
-    }
+    swal(
+      "Send the movie invitation",
+      `once you save, it will send the invitation`,
+      "info",
+      { buttons: false, timer: 2500 }
+    );
+    const userInfo = userList.find((user) => user.uid === uid);
+    setInviteInfo((inviteInfo) => [...inviteInfo, userInfo]);
+    setFriendListInfo(friendListInfo.filter((friend) => !(uid === friend.uid)));
   }
-  console.log(`AddInviteUid`, addInviteUid);
 
   function cancel() {
     history.push("/personal");
   }
 
-  console.log(currentUserInfo);
-  console.log(scheduleInfo);
-  console.log(selectDate);
-  console.log(watchWithInfo);
-  console.log(friendListInfo);
-  console.log(inviteInfo);
-
   return (
-    <Background>
-      <Container>
-        <Wrap1>
-          <div>
-            <MovieName>{movieName}</MovieName>
-            <DatePickerStyled
-              closeOnScroll={true}
-              selected={selectDate}
-              onChange={(date) => setSelectDate(date)}
-            />
-          </div>
-          <Wrap2>
-            <Cancel onClick={cancel}>cancel</Cancel>
-            <Save onClick={editSave}>save</Save>
-          </Wrap2>
-        </Wrap1>
-        <Wrap3>
-          <Wrap4>
+    <Main>
+      <Background>
+        <Container>
+          <Wrap1>
             <div>
-              <WatchWithIcon /> Watch With
+              <MovieName>{movieName}</MovieName>
+              <DatePickerStyled
+                closeOnScroll={false}
+                selected={selectDate}
+                onChange={(date) => setSelectDate(date)}
+              />
             </div>
-            <ListContainer>
-              {watchWithInfo.map((watchWith) => {
+            <BtnWrap>
+              <Cancel onClick={cancel}>cancel</Cancel>
+              <Save onClick={editSave}>save</Save>
+            </BtnWrap>
+          </Wrap1>
+          <Wrap3>
+            <Wrap4>
+              <Wrap5>
+                <WatchWithIcon />
+                <Title>Watch With</Title>
+              </Wrap5>
+              <ListContainer>
+                {watchWithInfo.map((watchWith) => {
+                  return (
+                    <Friend>
+                      {watchWith.name}
+                      <Remove onClick={() => removeWatchwith(watchWith.uid)} />
+                    </Friend>
+                  );
+                })}
+              </ListContainer>
+              <Wrap5>
+                <InviteIcon />
+                <Title>My Friends List</Title>
+              </Wrap5>
+              <ListContainer>
+                {friendListInfo.map((friend) => {
+                  return (
+                    <Friend>
+                      {friend.name}
+                      <Add onClick={() => sendWatchInvitation(friend.uid)} />
+                    </Friend>
+                  );
+                })}
+              </ListContainer>
+            </Wrap4>
+            <InvitingContainer>
+              <NowInvitedTitle>Send Invitation to</NowInvitedTitle>
+              {inviteInfo.map((invite) => {
                 return (
-                  <Friend>
-                    {watchWith.name}
-                    <Remove onClick={() => removeWatchwith(watchWith.uid)} />
-                  </Friend>
+                  <Invited>
+                    {invite.name}
+                    <Remove onClick={() => removeInvite(invite.uid)} />
+                  </Invited>
                 );
               })}
-            </ListContainer>
-            <div>
-              <InviteIcon />
-              Friends List
-            </div>
-            <ListContainer>
-              {friendListInfo.map((friend) => {
-                return (
-                  <Friend>
-                    {friend.name}
-                    <Add onClick={() => sendWatchInvitation(friend.uid)} />
-                  </Friend>
-                );
-              })}
-            </ListContainer>
-          </Wrap4>
-          <InvitingContainer>
-            <NowInvitedTitle>Send Invitation to</NowInvitedTitle>
-            {inviteInfo.map((invite) => {
-              return (
-                <Invited>
-                  {invite.name}
-                  <Remove onClick={() => removeInvite(invite.uid)} />
-                </Invited>
-              );
-            })}
-          </InvitingContainer>
-        </Wrap3>
-      </Container>
-    </Background>
+            </InvitingContainer>
+            <BtnWrapForPhone>
+              <Cancel onClick={cancel}>cancel</Cancel>
+              <Save onClick={editSave}>save</Save>
+            </BtnWrapForPhone>
+          </Wrap3>
+        </Container>
+      </Background>
+    </Main>
   );
 }
 
@@ -430,8 +416,6 @@ const iconStyle = {
   },
 };
 const Background = styled.section`
-  padding-left: 160px;
-  height: calc(100vh - 130px);
   background-color: ${Color.Background};
   background-image: url(${background});
   background-repeat: no-repeat;
@@ -441,30 +425,66 @@ const Background = styled.section`
   align-items: center;
 `;
 const Container = styled.div`
+  margin: 80px 0;
   border-radius: 10px;
   padding: 70px 50px;
   width: 50%;
   background-color: ${Color.Content};
   color: ${Color.Main};
+  @media (max-width: ${BreakPoint.lg}) {
+    width: 80%;
+  }
+  @media (max-width: ${BreakPoint.sm}) {
+    width: 100%;
+    padding: 70px 20px;
+  }
 `;
 const Wrap1 = styled.div`
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
 `;
-const Wrap2 = styled.div`
+const BtnWrap = styled.div`
   display: flex;
   align-items: center;
+  @media (max-width: ${BreakPoint.md}) {
+    display: none;
+  }
+`;
+const BtnWrapForPhone = styled.div`
+  margin-top: 60px;
+  display: none;
+  @media (max-width: ${BreakPoint.md}) {
+    display: flex;
+    justify-content: space-between;
+    
+  }
 `;
 const Wrap3 = styled.div`
   display: flex;
   margin-top: 40px;
   justify-content: space-between;
+  @media (max-width: ${BreakPoint.md}) {
+    flex-direction: column;
+  }
 `;
 const Wrap4 = styled.div`
   width: 55%;
+  @media (max-width: ${BreakPoint.md}) {
+    width: 100%;
+  }
+`;
+const Wrap5 = styled.div`
+  display: flex;
+  margin-bottom: 10px;
+`;
+const Title = styled.h3`
+  margin-left: 10px;
+  font-size: 1.25rem;
 `;
 const MovieName = styled.h3`
+  line-height: 1.2;
+  margin-bottom: 36px;
   font-size: 2rem;
 `;
 const Cancel = styled.button`
@@ -484,6 +504,9 @@ const InviteIcon = styled(MdPersonAddAlt1)`
   color: ${Color.Light};
 `;
 const ListContainer = styled.div`
+  padding: 0 20px;
+  border: 2px solid ${Color.LLight};
+  border-radius: 5px;
   width: 100%;
   height: 120px;
   overflow-y: scroll;
@@ -495,8 +518,16 @@ const ListContainer = styled.div`
 `;
 const Friend = styled.div`
   position: relative;
-  border-bottom: 1px solid ${Color.LLight};
   padding: 10px 20px;
+  &:not(:last-child)::before{
+    content: "";
+    position: absolute;
+    height: 2px;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    background-color: ${Color.LLight};
+  }
 `;
 const Remove = styled(IoMdRemoveCircle)`
   ${iconStyle};
@@ -513,11 +544,15 @@ const Add = styled(MdAddCircle)`
   cursor: pointer;
 `;
 const InvitingContainer = styled.section`
+  border-radius: 5px;
   padding: 10px;
-  margin-top: 28px;
+  margin-top: 40px;
   width: 40%;
   color: ${Color.Dark};
-  background-color: #eee;
+  background-color: ${Color.LLight};
+  @media (max-width: ${BreakPoint.md}) {
+    width: 100%;
+  }
 `;
 const NowInvitedTitle = styled.h3`
   font-size: 1.2rem;

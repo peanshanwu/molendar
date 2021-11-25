@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import * as Color from "../../components/layout/Color";
-import Slider from "react-slick";
 import { format, isSameDay } from "date-fns";
 import DisplayStar from "../../components/common/DisplayStar";
 import { MdDelete } from "react-icons/md";
 import { FaPen } from "react-icons/fa";
+import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import firebase from "../../utils/firebase";
+import swal from "sweetalert";
+import * as BreakPoint from "../../components/layout/BreakPoints"
 
 function Info({
   uid,
@@ -21,6 +23,7 @@ function Info({
   userList,
 }) {
   const db = firebase.firestore();
+  const history = useHistory();
   const userRef = db.collection("users");
   const movieRef = db.collection("movie_invitations");
   const settings = {
@@ -77,7 +80,7 @@ function Info({
         const oneMovie = calendarMoviesInfo.find(
           (movieInfo) => schedule.movie_id === movieInfo.id
         );
-        movieScheduleObj.movieInfo = oneMovie; // 獲取電影資訊，存入obj裡面的movieInfo欄位
+        movieScheduleObj.movieInfo = oneMovie; // 獲取電影資訊，存入obj裡面的movieInfo欄位
 
         let watchWithInfoArr = [];
         // 做成用來render的資料前，先篩掉是currentUser的id
@@ -101,43 +104,83 @@ function Info({
   }, [selectDayOfMyMovies]);
 
   function deleteMovie(delete_doc_id) {
-    // 所有行程刪除
-    db.collectionGroup("user_calendar")
-      .where("event_doc_id", "==", delete_doc_id)
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((docRef) => {
-          const docData = docRef.data();
-          console.log(docData);
-          console.log(docData.uid);
-          console.log(docData.doc_id);
-          userRef
-            .doc(docData.uid)
-            .collection("user_calendar")
-            .doc(docData.doc_id)
-            .delete();
-        });
-      });
+    swal({
+      title: "Are you sure?",
+      text: "Once you delete, others calendar delete, too",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    }).then((willDelete) => {
+      if (willDelete) {
+        // 所有行程刪除
+        db.collectionGroup("user_calendar")
+          .where("event_doc_id", "==", delete_doc_id)
+          .get()
+          .then((querySnapshot) => {
+            querySnapshot.forEach((docRef) => {
+              const docData = docRef.data();
+              console.log(docData);
+              console.log(docData.uid);
+              console.log(docData.doc_id);
+              userRef
+                .doc(docData.uid)
+                .collection("user_calendar")
+                .doc(docData.doc_id)
+                .delete();
+            });
+            setPopupClick(false);
+          });
 
-    // 邀請刪除
-    movieRef
-      .where("event_doc_id", "==", delete_doc_id)
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((docRef) => {
-          const docData = docRef.data();
-          movieRef.doc(docData.doc_id).delete();
+        // 邀請刪除
+        movieRef
+          .where("event_doc_id", "==", delete_doc_id)
+          .get()
+          .then((querySnapshot) => {
+            querySnapshot.forEach((docRef) => {
+              const docData = docRef.data();
+              movieRef.doc(docData.doc_id).delete();
+            });
+          });
+        swal("Deleted!", {
+          icon: "success",
+          buttons: false,
+          timer: 1500,
         });
-      });
+      } else {
+        swal("Maybe think about it is right!", { button: false, timer: 1500 });
+      }
+    });
+
+    // // 所有行程刪除
+    // db.collectionGroup("user_calendar")
+    //   .where("event_doc_id", "==", delete_doc_id)
+    //   .get()
+    //   .then((querySnapshot) => {
+    //     querySnapshot.forEach((docRef) => {
+    //       const docData = docRef.data();
+    //       console.log(docData);
+    //       console.log(docData.uid);
+    //       console.log(docData.doc_id);
+    //       userRef
+    //         .doc(docData.uid)
+    //         .collection("user_calendar")
+    //         .doc(docData.doc_id)
+    //         .delete();
+    //     });
+    //     setPopupClick(false);
+    //   });
+
+    // // 邀請刪除
+    // movieRef
+    //   .where("event_doc_id", "==", delete_doc_id)
+    //   .get()
+    //   .then((querySnapshot) => {
+    //     querySnapshot.forEach((docRef) => {
+    //       const docData = docRef.data();
+    //       movieRef.doc(docData.doc_id).delete();
+    //     });
+    //   });
   }
-
-  console.log(`selectDayOfMyMovies`, selectDayOfMyMovies);
-  console.log(`selectDayOfMoviesInfo`, selectDayOfMoviesInfo);
-  console.log(`watchWithUserInfo`, watchWithUserInfo);
-  // console.log(`myCalendarMovies`, myCalendarMovies);
-  // console.log(`calendarMoviesInfo`, calendarMoviesInfo);
-  // console.log(`selectDay`, selectDay);
-  // console.log(`userList`, userList);
 
   return (
     <>
@@ -149,6 +192,7 @@ function Info({
               {selectDayOfMoviesInfo?.map((movie) => {
                 return (
                   <Container backdrop={movie.movieInfo?.backdrop_path}>
+                    {/* <Gradient /> */}
                     <Header>
                       <Day>
                         {format(selectDay, "MM / dd")}
@@ -156,42 +200,40 @@ function Info({
                       </Day>
                       {movie.watchWith.map((userInfo) => {
                         return (
-                          <>
+                          <WatchWithWrap>
                             <WatchWithPic photoURL={userInfo.photoURL} />
                             <WatchWithName>{userInfo.name}</WatchWithName>
-                          </>
+                          </WatchWithWrap>
                         );
                       })}
-                      {/* ----測試jsx回傳空陣列的話，結論：不會發生任何事 */}
-                      {/* <button>JJJJ{[]}</button> */}
                       {movie.scheduleOwner === uid && (
-                        <>
+                        <IconWrap>
                           <DeleteIcon
                             onClick={() => {
                               deleteMovie(movie.event_doc_id);
                             }}
                           />
-                          <Link to={`/edit/${movie.doc_id}`}>
+                          <EditLink to={`/edit/${movie.doc_id}`}>
                             <EditIcon />
-                          </Link>
-                        </>
+                          </EditLink>
+                        </IconWrap>
                       )}
                     </Header>
 
                     <Wrap>
-                      <Link to={`/movie/${movie.movieInfo.id}`}>
-                        <MovieName>{movie.movieInfo.original_title}</MovieName>
+                      <Link to={`/movie/${movie.movieInfo?.id}`}>
+                        <MovieName>{movie.movieInfo?.original_title}</MovieName>
                       </Link>
                       <StarWrapper>
                         <DisplayStar
-                          starPoints={movie.movieInfo.vote_average}
+                          starPoints={movie.movieInfo?.vote_average}
                         />
                       </StarWrapper>
                       <SubInfo>
-                        Release Date | {movie.movieInfo.release_date}
-                      </SubInfo>{" "}
-                      <SubInfo>Reviews | {movie.movieInfo.vote_count}</SubInfo>
-                      <OverView>{movie.movieInfo.overview}</OverView>
+                        Release Date | {movie.movieInfo?.release_date}
+                      </SubInfo>
+                      <SubInfo>Reviews | {movie.movieInfo?.vote_count}</SubInfo>
+                      <OverView>{movie.movieInfo?.overview}</OverView>
                     </Wrap>
                   </Container>
                 );
@@ -208,8 +250,8 @@ const iconStyle = {
   fontSize: "1.9rem",
   color: Color.Main,
   cursor: "pointer",
-  WebkitFilter: "drop-shadow(0 1px 5px rgba(0, 0, 0, 1))",
-  filter: "drop-shadow(0 1px 5px rgba(0, 0, 0, 1))",
+  WebkitFilter: "drop-shadow(0 2px 5px rgba(0, 0, 0, .5))",
+  filter: "drop-shadow(0 2px 5px rgba(0, 0, 0, .5))",
   transition: ".3s ease",
   "&:hover": {
     color: Color.Content,
@@ -218,7 +260,7 @@ const iconStyle = {
   },
 };
 const Mask = styled.section`
-  z-index: 1;
+  z-index: 2;
   position: absolute;
   top: 0;
   bottom: 0;
@@ -228,39 +270,61 @@ const Mask = styled.section`
 `;
 const Wrapper = styled.section`
   color: ${Color.Content};
-  width: 60%;
+  width: 70%;
   position: fixed;
   z-index: 2;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  height: 500px;
   box-shadow: 2px 3px 50px rgba(0, 0, 0, 0.7);
-  /* outline: 2px solid red; */
-  /* background-color: #fff; */
+  @media (max-width: 1000px) {
+    width: 90%;
+  }
 `;
 const Container = styled.main`
   padding: 20px 30px;
-  background-image: url(https://image.tmdb.org/t/p/w1280/${(props) =>
-    props.backdrop});
+  background-image: url(https://image.tmdb.org/t/p/w1280/${(props) => props.backdrop});
   background-size: cover;
   background-repeat: no-repeat;
   position: relative;
+  background-position: center;
   height: 500px;
   color: white;
   background-color: ${Color.Background};
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 40%;
+    background: linear-gradient(90deg, ${Color.Background} 10%, transparent);
+  }
+  @media (max-width: 1000px) {
+    height: 400px;
+  }
 `;
 const Header = styled.div`
-  /* position: fixed;
-  top: 0; */
+  position: relative;
+  top: 0;
   display: flex;
   align-items: center;
+  @media (max-width: ${BreakPoint.sm}){
+    flex-direction: column;
+    align-items: flex-start;
+  }
 `;
 const Wrap = styled.section`
-  max-width: 40%;
+  max-width: 50%;
   position: relative;
   top: 50%;
   transform: translateY(-50%);
+  @media (max-width: ${BreakPoint.lg}) {
+    max-width: 70%;
+  }
+  @media (max-width: ${BreakPoint.sm}){
+    max-width: 100%;
+  }
 `;
 const Day = styled.h3`
   color: ${Color.Main};
@@ -270,26 +334,36 @@ const DayOfWeek = styled.span`
   font-size: 1rem;
   margin-left: 10px;
 `;
+const WatchWithWrap = styled.div`
+  padding-top: 12px;
+  margin-left: 20px;
+  display: flex;
+  align-content: center;
+  @media (max-width: ${BreakPoint.sm}){
+    margin-left: 0;
+  }
+`;
 const WatchWithPic = styled.div`
   background-image: url(${(props) => props.photoURL});
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
 `;
 const WatchWithName = styled.p`
-  font-size: 1rem;
-  margin-right: auto;
-`;
-const WatchWithOthers = styled.span`
-  margin-left: 15px;
-  font-size: 1rem;
+  margin-left: 0.5rem;
 `;
 const MovieName = styled.h1`
-  font-size: 3rem;
+  /* word-break: break-all; */
+  word-break: break-word;
+  font-size: 2.5rem;
   width: 100%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
 `;
 const StarWrapper = styled.div`
   display: flex;
@@ -308,7 +382,22 @@ const OverView = styled.p`
   letter-spacing: 1px;
   margin-top: 30px;
   font-weight: 300;
-  line-height: 24px;
+  /* word-break: break-all; */
+  /* word-break: break-word; */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  @media (max-width: ${BreakPoint.sm}){
+    display: none;
+  }
+`;
+const IconWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  top: 10px;
 `;
 const DeleteIcon = styled(MdDelete)`
   ${iconStyle};
@@ -319,5 +408,20 @@ const EditIcon = styled(FaPen)`
   font-size: 1.5rem;
   margin-left: 1rem;
 `;
+const EditLink = styled(Link)`
+  padding-top: 4px;
+  display: inline-block;
+`;
+// const Gradient = styled.div`
+//   /* display: flex; */
+//   /* align-items: center; */
+//   /* padding-top: 150px; */
+//   width: 100%;
 
+//   height: 100%;
+//   /* position: relative;
+//   top: 40%; */
+//   background: linear-gradient(90deg, ${Color.Background} 10%, transparent);
+//   color: ${Color.Content};
+// `;
 export default Info;

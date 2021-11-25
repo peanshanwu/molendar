@@ -1,87 +1,99 @@
-import React from 'react'
-import { useState } from 'react'
-import { format, getDate, isSameDay } from 'date-fns'
-import useCalendar, { WEEKS } from './useCalendar.js'
-import * as Styled from './Calendar-styled'
-import styled from 'styled-components'
-
+import React from "react";
+import { useState } from "react";
+import styled from "styled-components";
+import { format, getDate, isSameDay } from "date-fns";
+import useCalendar, { WEEKS } from "./useCalendar.js";
+import * as Color from "../layout/Color";
+import { IndexMonthControl as MonthControl } from "./Calendar-styled";
+import { IndexCalendar as DatePicker } from "./Calendar-styled";
+import { IndexTr as Tr } from "./Calendar-styled";
+import { IndexWeekTr as Week } from "./Calendar-styled";
+import { IndexTd as Td } from "./Calendar-styled";
 
 const Calendar = ({ selectDay, setSelectDay }) => {
-	
-	const [startDay, setStartDay] = useState(new Date())
-	const calendar = useCalendar(startDay, setStartDay)
-	
-	const selectDate = (date) => {
-		setSelectDay(date)
-	}
-	
-	return (
-		<div>
-			<Styled.Calendar>
-				<thead>
-					<tr>
-						<td colSpan="100%">
-									<PreMonthBtn onClick={calendar.setPreMonth}>
-									◀
-									</PreMonthBtn>
-									{format(startDay, 'MMMM ')}
-									{format(startDay, 'yyyy')}
-									<NextMonthBtn onClick={calendar.setNextMonth}>
-									▶
-									</NextMonthBtn>
-							</td>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-							{WEEKS.map((title, i) => {
-									return <td key={i}>{title}</td>
-							})}
-					</tr>
-					{calendar.days.map((week, i) => {
-						return (
-							<tr key={i}>
-								{week.map((date, i) => {
-									const otherMonth = date.otherMonth
-									const isSelected = isSameDay(
-										selectDay,
-										date.date,
-									)
-									const className = `${
-										otherMonth && 'other'
-									} ${isSelected && 'selected'}`
-									const selectedToday = () => { selectDate(date.date) }
-									return (
-										<td
-											key={i}
-											className={className}
-											onClick={selectedToday}
-										>
-											{getDate(date.date)}
-										</td>
-									)
-								})}
-							</tr>
-						)
-						})}
-				</tbody>
-			</Styled.Calendar>
-		</div>
-	)
-}
+  const [startDay, setStartDay] = useState(new Date());
+  const calendar = useCalendar(startDay, setStartDay);
 
+  const selectDate = (date) => {
+    setSelectDay(date);
+  };
 
+  return (
+    <div>
+      <DatePicker>
+        <thead>
+          <MonthControl>
+            <td colSpan="100%">
+              {format(startDay, "MMMM ")}
+              {format(startDay, "yyyy")}
+              <IconWrap>
+                <PreMonthBtn onClick={calendar.setPreMonth} />
+                <NextMonthBtn onClick={calendar.setNextMonth} />
+              </IconWrap>
+            </td>
+          </MonthControl>
+        </thead>
+        <tbody>
+          <Week>
+            {WEEKS.map((title, i) => {
+              return <td key={i}>{title}</td>;
+            })}
+          </Week>
+          {calendar.days.map((week, i) => {
+            return (
+              <Tr key={i}>
+                {week.map((date, i) => {
+                  const otherMonth = date.otherMonth;
+                  const isSelected = isSameDay(selectDay, date.date);
+                  const className = `${otherMonth && "other"} ${
+                    isSelected && "selected"
+                  }`;
+                  const selectedToday = () => {
+                    console.log("hi");
+                    selectDate(date.date);
+                  };
+                  return (
+                    <Td key={i} className={className} onClick={selectedToday}>
+                      {getDate(date.date)}
+                    </Td>
+                  );
+                })}
+              </Tr>
+            );
+          })}
+        </tbody>
+      </DatePicker>
+    </div>
+  );
+};
+
+const IconWrap = styled.div`
+  position: absolute;
+  top: 0;
+  right: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  height: 100%;
+  align-content: center;
+`;
 const PreMonthBtn = styled.button`
-	border-color: transparent;
-	background-color: #fff;
-	margin-right: 30px
-`
+  margin-right: 50px;
+  margin-left: 20px;
+  cursor: pointer;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 10px 15px 10px 0;
+  border-color: transparent ${Color.Background} transparent transparent;
+`;
 const NextMonthBtn = styled.button`
-	border-color: transparent;
-	background-color: #fff;
-	margin-left: 30px;
-`
+  margin-left: 20px;
+  cursor: pointer;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 10px 0 10px 15px;
+  border-color: transparent transparent transparent ${Color.Background};
+`;
 
-
-
-export default Calendar
+export default Calendar;

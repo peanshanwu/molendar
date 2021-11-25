@@ -1,215 +1,121 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import * as Color from "../../components/layout/Color";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import DisplayStar from "../../components/common/DisplayStar";
-import { ImCross } from "react-icons/im";
-import EasyEdit, { Types } from "react-easy-edit";
-// import Loading from '../../components/layout/Loading'
+import { Link, useHistory } from "react-router-dom";
+import * as Color from "../../components/layout/Color";
+import { fetchCollectionMovies } from "../../utils/api";
+import CollectionItem from "./CollectionItem";
+import * as Title from "../../components/layout/Title";
+import * as Container from "../../components/layout/Container";
+import Loading from "../../components/layout/Loading";
+import { v4 as uuidv4 } from 'uuid';
 
-const CustomDisplay = (props) => {
-  const val = props.value || "redlohecalp motsuC";
-  return <div>{val.split("").reverse().join("")}</div>;
-};
+// redux
+import { useSelector } from "react-redux";
 
-function Collection() {
-  const save = (value) => {
-    alert(value);
-  };
-  const cancel = () => {
-    alert("Cancelled");
-  };
+export default function Collection({ uid }) {
+  const history = useHistory();
+  if (!uid) {
+    window.alert("please Login first, thank you");
+    history.push("/");
+  }
+
+  console.log(uid);
+  
+  const [isLoading, setIsLoading] = useState(true);
+  const [collectionInfo, setCollectionInfo] = useState();
+  const currentUserInfo = useSelector((state) => state.currentUserInfo);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (isMounted) {
+      currentUserInfo &&
+        fetchCollectionMovies(currentUserInfo.user_collection).then(
+          (movieInfo) => {
+            setCollectionInfo(movieInfo);
+            setIsLoading(false)
+          }
+        );
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [currentUserInfo]);
+
 
   return (
     <>
-      <Wrapper>
-        <Main>
-          <Container>
-            <Title>My Collection</Title>
-            <CommentWrap>
-              <Poster src="https://image.tmdb.org/t/p/w500/9kg73Mg8WJKlB9Y2SAJzeDKAnuB.jpg" />
-              <Wrap1>
-                <Wrap2>
-                  <MovieName>Movie Name</MovieName>
-                  <StarWrapper>
-                    <DisplayStar starPoints={10} />
-                  </StarWrapper>
-                </Wrap2>
-                <EditWrap>
-                  <EasyEdit
-                    // type={Types.TEXT}
-                    // value="em esrever ot em kcilC"
-                    // onSave={val => console.log(val)}
-                    // displayComponent={<CustomDisplay />}
-                    // instructions="Custom placeholder reverses text"
-                    type="text"
-                    onSave={save}
-                    onCancel={cancel}
-                    saveButtonLabel="Save"
-                    cancelButtonLabel="Cancel"
-                    attributes={{ name: "awesome-input", id: 1 }}
-                    instructions="write down your short comment!"
-                  />
-                </EditWrap>
-                <IconWrap>
-                  <Cansel />
-                </IconWrap>
-              </Wrap1>
-            </CommentWrap>
-            <CommentWrap>
-              <Poster src="https://image.tmdb.org/t/p/w500/9kg73Mg8WJKlB9Y2SAJzeDKAnuB.jpg" />
-              <Wrap1>
-                <Wrap2>
-                  <MovieName>Movie Name</MovieName>
-                  <StarWrapper>
-                    <DisplayStar starPoints={10} />
-                  </StarWrapper>
-                </Wrap2>
-                <EditWrap>
-                  <EasyEdit
-                    // type={Types.TEXT}
-                    // value="em esrever ot em kcilC"
-                    // onSave={val => console.log(val)}
-                    // displayComponent={<CustomDisplay />}
-                    // instructions="Custom placeholder reverses text"
-                    type="text"
-                    onSave={save}
-                    onCancel={cancel}
-                    saveButtonLabel="Save"
-                    cancelButtonLabel="Cancel"
-                    attributes={{ name: "awesome-input", id: 1 }}
-                    instructions="write down your short comment!"
-                  />
-                </EditWrap>
-                <IconWrap>
-                  <Cansel />
-                </IconWrap>
-              </Wrap1>
-            </CommentWrap>
-            <CommentWrap>
-              <Poster src="https://image.tmdb.org/t/p/w500/9kg73Mg8WJKlB9Y2SAJzeDKAnuB.jpg" />
-              <Wrap1>
-                <Wrap2>
-                  <MovieName>Movie Name</MovieName>
-                  <StarWrapper>
-                    <DisplayStar starPoints={10} />
-                  </StarWrapper>
-                </Wrap2>
-                <EditWrap>
-                  <EasyEdit
-                    // type={Types.TEXT}
-                    // value="em esrever ot em kcilC"
-                    // onSave={val => console.log(val)}
-                    // displayComponent={<CustomDisplay />}
-                    // instructions="Custom placeholder reverses text"
-                    type="text"
-                    onSave={save}
-                    onCancel={cancel}
-                    saveButtonLabel="Save"
-                    cancelButtonLabel="Cancel"
-                    attributes={{ name: "awesome-input", id: 1 }}
-                    instructions="write down your short comment!"
-                  />
-                </EditWrap>
-                <IconWrap>
-                  <Cansel />
-                </IconWrap>
-              </Wrap1>
-            </CommentWrap>
-          </Container>
-        </Main>
-      </Wrapper>
+      {isLoading ? <Loading /> :
+        <Container.Main>
+          <Wrap>
+            <Title.Sub>Collections</Title.Sub>
+            {collectionInfo?.length > 0 ? (
+              <FlexWrap>
+                {collectionInfo.map((result) => {
+                  const url = result.poster_path
+                    ? `https://image.tmdb.org/t/p/w500${result.poster_path}`
+                    : `https://firebasestorage.googleapis.com/v0/b/molendar-shan.appspot.com/o/default_photo.png?alt=media&token=376c66cd-730d-44b7-a2f1-347999a60c02`;
+
+                  return (
+                    <CollectionItem
+                      url={url}
+                      result={result}
+                      uid={currentUserInfo.uid}
+                      key={uuidv4()}
+                    />
+                  );
+
+                })}
+              </FlexWrap>
+            ) : (
+              <NoItem>
+                Sorry, you don't have collection <span> ...</span>
+                <Link to={`/`}> | Back to index</Link>
+              </NoItem>
+            )}
+          </Wrap>
+        </Container.Main>
+      }
     </>
+
   );
 }
-const iconStyle = {
-  fontSize: "1.5rem",
-  color: Color.Main,
-  cursor: "pointer",
-  transition: ".3s ease",
-  "&:hover": {
-    color: Color.Content,
-    WebkitFilter: "drop-shadow(0 0 5px rgba(0, 204, 204, 1))",
-    filter: "drop-shadow(0 0 5px rgba(0, 204, 204, 1))",
-  },
-};
-const Wrapper = styled.section`
+
+// const Wrapper = styled.section`
+//   color: ${Color.Content};
+//   position: relative;
+//   width: 100%;
+//   min-height: calc(100vh - 130px);
+//   background-color: ${Color.Background};
+// `;
+// const Main = styled.main`
+//   width: calc(100% - 80px);
+//   position: relative;
+//   left: 80px;
+//   @media (max-width: ${BreakPoint.lg}) {
+//     width: 100%;
+//     position: static;
+//   }
+// `;
+const Wrap = styled(Container.MaxWidthContainer)`
   color: ${Color.Content};
-  padding: 40px 0;
-  position: relative;
-  width: 100%;
-  /* border: 1px solid gray; */
-  /* background-image: url(); */
-  background-color: ${Color.Background};
-`;
-const Main = styled.main`
-  width: calc(100% - 80px);
-  position: relative;
-  left: 80px;
-`;
-const Container = styled.div`
-  word-break: break-all;
   max-width: 1000px;
   width: 100%;
-  margin: 0 auto;
-  /* outline: 1px solid gray; */
+  padding: 100px 2rem;
 `;
-const Wrap1 = styled.div`
-  width: 100%;
-  /* outline: 1px solid red ; */
+const NoItem = styled.div`
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-`;
-const Wrap2 = styled.div`
-  width: 80%;
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  /* outline: 1px solid yellow; */
-`;
-const Title = styled.h1`
-  font-size: 2rem;
-  margin-bottom: 20px;
-`;
-const MovieName = styled.h2`
-  font-size: 2rem;
-`;
-const EditWrap = styled.div`
-  width: 80%;
-  /* height: 300px; */
-  max-height: 300px;
-  overflow-y: scroll;
-  /* background-color: ${Color.Light}; */
-`;
-const CommentWrap = styled.div`
   width: 100%;
-  /* height: 500px; */
-  background-color: ${Color.Sub};
-  margin-bottom: 50px;
-  display: flex;
-  position: relative;
-`;
-const Poster = styled.img`
-  width: 30%;
-  background-color: ${Color.Background};
-`;
-const IconWrap = styled.div`
-  position: absolute;
-  top: 20px;
-  right: 20px;
-`;
-const Cansel = styled(ImCross)`
-  ${iconStyle}
+  height: calc(100vh - 130px);
+  color: ${Color.Dark};
+  font-weight: 100;
   font-size: 1.25rem;
+  /* background-color: ${Color.Sub}; */
 `;
-const StarWrapper = styled.div`
-  color: ${Color.Main};
+const FlexWrap = styled.div`
   display: flex;
   flex-wrap: wrap;
-  margin-left: 15px;
-  font-size: 20px;
+  justify-content: flex-start;
+  gap: 10vh 5.7%;
 `;
-
-export default Collection;

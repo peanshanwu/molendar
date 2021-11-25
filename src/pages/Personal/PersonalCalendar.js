@@ -3,9 +3,11 @@ import { useState } from "react";
 import { format, getDate, isSameDay } from "date-fns";
 import useCalendar, { WEEKS } from "../../components/calendar/useCalendar.js";
 import * as Styled from "../../components/calendar/Calendar-styled";
+import * as Color from "../../components/layout/Color";
 import styled from "styled-components";
 import Info from "./Info";
 import firebase from "../../utils/firebase";
+import * as BreakPoint from "../../components/layout/BreakPoints"
 import { fetchMultiMovies } from "../../utils/api.js";
 
 // setSelectDay={setSelectDay}
@@ -85,6 +87,8 @@ const PersonalCalendar = ({
     }
   }
 
+  console.log(calendarMoviesInfo);
+
   return (
     <>
       <Info
@@ -99,14 +103,15 @@ const PersonalCalendar = ({
 
       <Styled.PersonalCalendar>
         <thead>
-          <tr>
+          <Styled.MonthControl>
             <td colSpan="100%">
-              <PreMonthBtn onClick={calendar.setPreMonth}>◀</PreMonthBtn>
+              {/* <PreMonthBtn onClick={calendar.setPreMonth}>◀</PreMonthBtn> */}
+              <PreMonthBtn onClick={calendar.setPreMonth}>《</PreMonthBtn>
               {format(startDay, "MMMM ")}
               {format(startDay, "yyyy")}
-              <NextMonthBtn onClick={calendar.setNextMonth}>▶</NextMonthBtn>
+              <NextMonthBtn onClick={calendar.setNextMonth}>》</NextMonthBtn>
             </td>
-          </tr>
+          </Styled.MonthControl>
         </thead>
         <tbody>
           <tr>
@@ -127,7 +132,10 @@ const PersonalCalendar = ({
                     selectDate(date.date);
                   };
                   return (
-                    <td
+                    <Styled.Td
+                      bgImg={`https://image.tmdb.org/t/p/w500/${
+                        getMovieInfo(getMovieId(date.date))?.poster_path
+                      }`}
                       key={i}
                       className={className}
                       onClick={() => {
@@ -137,28 +145,27 @@ const PersonalCalendar = ({
                         }
                       }}
                     >
-                      {getDate(date.date)}
+                      <DayNum>{getDate(date.date)}</DayNum>
 
-                      {getMovieId(date.date).length !== 0 && (
-                        <MovieContainer>
+                      {getMovieId(date.date).length > 0 && (
+                        <>
                           <Mask />
-                          <MovieName>
-                            {calendarMoviesInfo.length !== 0 &&
-                              getMovieInfo(getMovieId(date.date))
-                                ?.original_title}
-                          </MovieName>
-                          <Poster
-                            src={
-                              calendarMoviesInfo.length !== 0 &&
-                              `https://image.tmdb.org/t/p/w500/${
-                                getMovieInfo(getMovieId(date.date))?.poster_path
-                              }`
-                            }
-                            alt=""
-                          />
-                        </MovieContainer>
+                          <MovieContainer>
+                            <MovieName>
+                              {calendarMoviesInfo.length > 0 &&
+                                getMovieInfo(getMovieId(date.date))
+                                  ?.original_title}
+                            </MovieName>
+                          </MovieContainer>
+                          {getMovieId(date.date).length > 1 ? (
+                            <>
+                              <More>More</More>
+                              <MoreForPhone />
+                            </>
+                          ) : null}
+                        </>
                       )}
-                    </td>
+                    </Styled.Td>
                   );
                 })}
               </tr>
@@ -172,30 +179,31 @@ const PersonalCalendar = ({
 
 const PreMonthBtn = styled.button`
   border-color: transparent;
-  background-color: #fff;
+  color: ${Color.Content};
+  font-size: 1.5rem;
   margin-right: 30px;
 `;
 const NextMonthBtn = styled.button`
   border-color: transparent;
-  background-color: #fff;
+  color: ${Color.Content};
+  font-size: 1.5rem;
   margin-left: 30px;
 `;
-const Poster = styled.img`
-  width: 100%;
-`;
-// const Poster = styled.div`
-//  width: 100%;
-// 	height: 300px;
-// 	background-image: url(https://image.tmdb.org/t/p/w500//cm2ffqb3XovzA5ZSzyN3jnn8qv0.jpg);
-// 	background-size: contain;
-// `
-const Td = styled.td`
-  background-image: url(https://image.tmdb.org/t/p/w500//cm2ffqb3XovzA5ZSzyN3jnn8qv0.jpg);
-  background-size: contain;
+const DayNum = styled.p`
+  position: absolute;
+  z-index: 1;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
 `;
 const MovieContainer = styled.div`
+  margin: 0 auto;
+  padding: 20px;
   width: 100%;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `;
 const Mask = styled.div`
   position: absolute;
@@ -203,6 +211,7 @@ const Mask = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
+  cursor: pointer;
   background-color: rgba(0, 0, 0, 0.5);
   transition: ease-in 0.3s;
   &:hover {
@@ -210,8 +219,49 @@ const Mask = styled.div`
   }
 `;
 const MovieName = styled.h3`
-  position: absolute;
-  font-size: 1.2rem;
+  /* word-break: break-all; */
+  /* word-break: break-word; */
+  /* position: absolute; */
+  font-size: 1.4rem;
+  font-size: 300;
+  margin-top: 20px;
+  cursor: pointer;
+  @media (max-width: 1000px) {
+    display: none;
+  }
 `;
+const More = styled.p`
+  width: 60%;
+  font-size: 1rem;
+  font-weight: 400;
+  margin-top: 0;
+  color: ${Color.Main};
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 2px solid ${Color.Main};
+  border-radius: 50px;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  @media (max-width: ${BreakPoint.sm}) {
+    display: none;
+  }
+`;
+const MoreForPhone = styled.div`
+  display: none;
+  background-color: ${Color.Main};
+  width: 10px;
+  height: 10px;
+  border-radius: 50px;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  @media (max-width: ${BreakPoint.sm}) {
+    display: block
+  }
+`
 
 export default PersonalCalendar;

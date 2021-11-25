@@ -1,61 +1,92 @@
-import React, { useState, useEffect } from 'react'
-import styled from 'styled-components'
-import { BrowserRouter as Router, Switch, Route, Link, useHistory } from 'react-router-dom'
-import { TiThMenu } from 'react-icons/ti'
-import { AiFillHome } from 'react-icons/ai'
-import { BiLogOut } from 'react-icons/bi'
-import { FaSearch, FaHeart } from 'react-icons/fa'
-import { BsFillPersonFill, BsPersonCircle } from 'react-icons/bs'
-import * as Color from './Color'
-import Nav from './Nav'
-import firebase from '../../utils/firebase'
-
+import React, { useState } from "react";
+import styled from "styled-components";
+import { Link, useHistory } from "react-router-dom";
+import { AiFillHome } from "react-icons/ai";
+import { BiLogOut } from "react-icons/bi";
+import { FaSearch, FaHeart } from "react-icons/fa";
+import { BsFillPersonFill } from "react-icons/bs";
+import * as Color from "./Color";
+import firebase from "../../utils/firebase";
+import Search from "./Search";
+import swal from "sweetalert";
+import * as BreakPoint from "../../components/layout/BreakPoints"
 
 function Header({ user }) {
   const history = useHistory();
+  const [displaySearchBar, setDisplaySearchBar] = useState(false);
 
-  // const [user, setUser] = useState(null) //儲存user狀態，要改成redux
+  console.log(displaySearchBar);
 
-
-  // React.useEffect(() => {
-  //   firebase.auth().onAuthStateChanged((currentUser) => {
-  //     console.log('onAuthStateChanged 回傳',currentUser);
-  //     setUser(currentUser)
-  //   })
-  // },[])
-
-
-  // const [hamClick, setHamClick] = useState(false)
-  // const  navAnimation = useSpring({
-  //   transform: hamClick ? `translateX(0)` : `translateX(-150%)`
-  // });
+  function showSearchBar() {
+    if (displaySearchBar) {
+      setDisplaySearchBar(false);
+    } else {
+      setDisplaySearchBar(true);
+    }
+  }
+  
+  function handleSignOut() {
+    swal({
+      title: "Are you sure?",
+      icon: "info",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      if (willDelete) {
+        firebase.auth().signOut();
+        history.push("/");
+        swal("See ya!", {
+          icon: "success",
+          buttons: false,
+          timer: 1500
+        });
+      } else {
+        swal("Great Choice!",{
+          buttons: false,
+          timer: 1500
+        });
+      }
+    });
+  }
 
   return (
-    // <Nav style={ navAnimation }/>
-    <NavContainer>
-      {/* <HamIcon onClick={() => setHamClick(!hamClick)}/> */}
-        <Link to='/'>
+    <>
+      <Search
+        style={
+          displaySearchBar
+            ? { transform: `translateX(0) translateY(0)` }
+            : { transform: `translateX(0) translateY(-200%)` }
+        }
+        setDisplaySearchBar={setDisplaySearchBar}
+      />
+      <NavContainer>
+        <Link to="/">
           <HomeIcon />
         </Link>
-        <Link to='/personal'>
-          <MemberIcon />
-        </Link>
-        <Link to='/collection'>
+        {user ? (
+          <Link to="/personal">
+            <MemberIcon />
+          </Link>
+        ) : (
+          <Link to="/signin">
+            <MemberIcon />
+          </Link>
+        )}
+
+        <Link to="/collection">
           <CollectionIcon />
         </Link>
-        <SearchIcon />
-      
-        {user && <LogoutIcon onClick={() => {
-          // 優化，不要用alert
-          if (window.confirm("Do you really want to leave?")) {
-            firebase.auth().signOut()
-            history.push('/');
-          } else { return }
-        }} />}
+        <SearchIcon onClick={showSearchBar} />
 
+        {user && (
+          <LogoutIcon
+            onClick={handleSignOut}
+          />
+        )}
       </NavContainer>
-  )
-
+    </>
+  );
 }
 
 const iconStyle = {
@@ -63,19 +94,19 @@ const iconStyle = {
   color: Color.Dark,
   marginBottom: "30px",
   cursor: "pointer",
-  "transition": ".3s ease",
+  transition: ".3s ease",
   "&:hover": {
     color: Color.Content,
     WebkitFilter: "drop-shadow(0 0 5px rgba(0, 204, 204, 1))",
-    filter: "drop-shadow(0 0 5px rgba(0, 204, 204, 1))"
+    filter: "drop-shadow(0 0 5px rgba(0, 204, 204, 1))",
+  },
+  "& a": {
+    display: "inline-block",
+  },
+  "@media (max-width: 1200px)": {
+    marginBottom: "0",
   }
-}
-
-// const Wrapper = styled.div`
-//   position: fixed;
-//   z-index: 2;
-//   width: 100%;
-// `
+};
 const NavContainer = styled.section`
   position: fixed;
   z-index: 2;
@@ -86,28 +117,42 @@ const NavContainer = styled.section`
   width: 80px;
   height: 100vh;
   background-color: ${Color.Sub};
-`
-// const HamIcon = styled(TiThMenu)`
-//   ${iconStyle};
-// `
+  @media (max-width: ${BreakPoint.lg}) {
+    flex-direction: row;
+    width: 100%;
+    height: 60px;
+    left: 0;
+    bottom: -2px;
+    justify-content: space-between;
+  }
+`;
 const HomeIcon = styled(AiFillHome)`
   ${iconStyle};
-`
+`;
 const SearchIcon = styled(FaSearch)`
   ${iconStyle};
   font-size: 26px;
-`
+  @media (max-width: ${BreakPoint.lg}) {
+    padding-bottom: 2px;
+  }
+`;
 const MemberIcon = styled(BsFillPersonFill)`
   ${iconStyle};
-`
+`;
 const CollectionIcon = styled(FaHeart)`
   ${iconStyle};
-  font-size: 25px;
-`
+  font-size: 28px;
+  @media (max-width: ${BreakPoint.lg}) {
+    padding-top: 2px;
+  }
+`;
 const LogoutIcon = styled(BiLogOut)`
   ${iconStyle};
   margin-top: auto;
-`
+  font-size: 35px;
+  @media (max-width: ${BreakPoint.lg}) {
+    margin-top: 0;
+  }
+`;
 
-
-export default Header
+export default Header;
