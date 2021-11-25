@@ -82,7 +82,8 @@ const Container = styled.div`
   background-image: url(https://image.tmdb.org/t/p/w1280/${(props) =>
     props.backdrop});
   background-color: ${Color.Background};
-  background-size: contain;
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
   height: 515px;
   color: ${Color.Content};

@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { Link, useHistory } from "react-router-dom";
 import { AiFillHome } from "react-icons/ai";
 import { BiLogOut } from "react-icons/bi";
 import { FaSearch, FaHeart } from "react-icons/fa";
-import { BsFillPersonFill, BsPersonCircle } from "react-icons/bs";
+import { BsFillPersonFill } from "react-icons/bs";
 import * as Color from "./Color";
 import firebase from "../../utils/firebase";
 import Search from "./Search";
+import swal from "sweetalert";
+import * as BreakPoint from "../../components/layout/BreakPoints"
 
 function Header({ user }) {
   const history = useHistory();
@@ -22,6 +24,31 @@ function Header({ user }) {
       setDisplaySearchBar(true);
     }
   }
+  
+  function handleSignOut() {
+    swal({
+      title: "Are you sure?",
+      icon: "info",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      if (willDelete) {
+        firebase.auth().signOut();
+        history.push("/");
+        swal("See ya!", {
+          icon: "success",
+          buttons: false,
+          timer: 1500
+        });
+      } else {
+        swal("Great Choice!",{
+          buttons: false,
+          timer: 1500
+        });
+      }
+    });
+  }
 
   return (
     <>
@@ -31,6 +58,7 @@ function Header({ user }) {
             ? { transform: `translateX(0) translateY(0)` }
             : { transform: `translateX(0) translateY(-200%)` }
         }
+        setDisplaySearchBar={setDisplaySearchBar}
       />
       <NavContainer>
         <Link to="/">
@@ -53,16 +81,7 @@ function Header({ user }) {
 
         {user && (
           <LogoutIcon
-            onClick={() => {
-              // 優化，不要用alert
-              if (window.confirm("Do you really want to leave?")) {
-                firebase.auth().signOut();
-                history.push("/");
-                console.log(`user`, user);
-              } else {
-                return;
-              }
-            }}
+            onClick={handleSignOut}
           />
         )}
       </NavContainer>
@@ -81,13 +100,13 @@ const iconStyle = {
     WebkitFilter: "drop-shadow(0 0 5px rgba(0, 204, 204, 1))",
     filter: "drop-shadow(0 0 5px rgba(0, 204, 204, 1))",
   },
+  "& a": {
+    display: "inline-block",
+  },
+  "@media (max-width: 1200px)": {
+    marginBottom: "0",
+  }
 };
-
-// const Wrapper = styled.div`
-//   position: fixed;
-//   z-index: 2;
-//   width: 100%;
-// `
 const NavContainer = styled.section`
   position: fixed;
   z-index: 2;
@@ -98,6 +117,14 @@ const NavContainer = styled.section`
   width: 80px;
   height: 100vh;
   background-color: ${Color.Sub};
+  @media (max-width: ${BreakPoint.lg}) {
+    flex-direction: row;
+    width: 100%;
+    height: 60px;
+    left: 0;
+    bottom: -2px;
+    justify-content: space-between;
+  }
 `;
 const HomeIcon = styled(AiFillHome)`
   ${iconStyle};
@@ -105,17 +132,27 @@ const HomeIcon = styled(AiFillHome)`
 const SearchIcon = styled(FaSearch)`
   ${iconStyle};
   font-size: 26px;
+  @media (max-width: ${BreakPoint.lg}) {
+    padding-bottom: 2px;
+  }
 `;
 const MemberIcon = styled(BsFillPersonFill)`
   ${iconStyle};
 `;
 const CollectionIcon = styled(FaHeart)`
   ${iconStyle};
-  font-size: 25px;
+  font-size: 28px;
+  @media (max-width: ${BreakPoint.lg}) {
+    padding-top: 2px;
+  }
 `;
 const LogoutIcon = styled(BiLogOut)`
   ${iconStyle};
   margin-top: auto;
+  font-size: 35px;
+  @media (max-width: ${BreakPoint.lg}) {
+    margin-top: 0;
+  }
 `;
 
 export default Header;

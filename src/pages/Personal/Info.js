@@ -10,6 +10,8 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import firebase from "../../utils/firebase";
+import swal from "sweetalert";
+import * as BreakPoint from "../../components/layout/BreakPoints"
 
 function Info({
   uid,
@@ -78,7 +80,7 @@ function Info({
         const oneMovie = calendarMoviesInfo.find(
           (movieInfo) => schedule.movie_id === movieInfo.id
         );
-        movieScheduleObj.movieInfo = oneMovie; // 獲取電影資訊，存入obj裡面的movieInfo欄位
+        movieScheduleObj.movieInfo = oneMovie; // 獲取電影資訊，存入obj裡面的movieInfo欄位
 
         let watchWithInfoArr = [];
         // 做成用來render的資料前，先篩掉是currentUser的id
@@ -102,44 +104,83 @@ function Info({
   }, [selectDayOfMyMovies]);
 
   function deleteMovie(delete_doc_id) {
-    // 所有行程刪除
-    db.collectionGroup("user_calendar")
-      .where("event_doc_id", "==", delete_doc_id)
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((docRef) => {
-          const docData = docRef.data();
-          console.log(docData);
-          console.log(docData.uid);
-          console.log(docData.doc_id);
-          userRef
-            .doc(docData.uid)
-            .collection("user_calendar")
-            .doc(docData.doc_id)
-            .delete();
-        });
-        setPopupClick(false);
-      });
+    swal({
+      title: "Are you sure?",
+      text: "Once you delete, others calendar delete, too",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    }).then((willDelete) => {
+      if (willDelete) {
+        // 所有行程刪除
+        db.collectionGroup("user_calendar")
+          .where("event_doc_id", "==", delete_doc_id)
+          .get()
+          .then((querySnapshot) => {
+            querySnapshot.forEach((docRef) => {
+              const docData = docRef.data();
+              console.log(docData);
+              console.log(docData.uid);
+              console.log(docData.doc_id);
+              userRef
+                .doc(docData.uid)
+                .collection("user_calendar")
+                .doc(docData.doc_id)
+                .delete();
+            });
+            setPopupClick(false);
+          });
 
-    // 邀請刪除
-    movieRef
-      .where("event_doc_id", "==", delete_doc_id)
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((docRef) => {
-          const docData = docRef.data();
-          movieRef.doc(docData.doc_id).delete();
+        // 邀請刪除
+        movieRef
+          .where("event_doc_id", "==", delete_doc_id)
+          .get()
+          .then((querySnapshot) => {
+            querySnapshot.forEach((docRef) => {
+              const docData = docRef.data();
+              movieRef.doc(docData.doc_id).delete();
+            });
+          });
+        swal("Deleted!", {
+          icon: "success",
+          buttons: false,
+          timer: 1500,
         });
-      });
+      } else {
+        swal("Maybe think about it is right!", { button: false, timer: 1500 });
+      }
+    });
+
+    // // 所有行程刪除
+    // db.collectionGroup("user_calendar")
+    //   .where("event_doc_id", "==", delete_doc_id)
+    //   .get()
+    //   .then((querySnapshot) => {
+    //     querySnapshot.forEach((docRef) => {
+    //       const docData = docRef.data();
+    //       console.log(docData);
+    //       console.log(docData.uid);
+    //       console.log(docData.doc_id);
+    //       userRef
+    //         .doc(docData.uid)
+    //         .collection("user_calendar")
+    //         .doc(docData.doc_id)
+    //         .delete();
+    //     });
+    //     setPopupClick(false);
+    //   });
+
+    // // 邀請刪除
+    // movieRef
+    //   .where("event_doc_id", "==", delete_doc_id)
+    //   .get()
+    //   .then((querySnapshot) => {
+    //     querySnapshot.forEach((docRef) => {
+    //       const docData = docRef.data();
+    //       movieRef.doc(docData.doc_id).delete();
+    //     });
+    //   });
   }
-
-  console.log(`selectDayOfMyMovies`, selectDayOfMyMovies);
-  console.log(`selectDayOfMoviesInfo`, selectDayOfMoviesInfo);
-  console.log(`watchWithUserInfo`, watchWithUserInfo);
-  // console.log(`myCalendarMovies`, myCalendarMovies);
-  // console.log(`calendarMoviesInfo`, calendarMoviesInfo);
-  // console.log(`selectDay`, selectDay);
-  // console.log(`userList`, userList);
 
   return (
     <>
@@ -159,14 +200,14 @@ function Info({
                       </Day>
                       {movie.watchWith.map((userInfo) => {
                         return (
-                          <>
+                          <WatchWithWrap>
                             <WatchWithPic photoURL={userInfo.photoURL} />
                             <WatchWithName>{userInfo.name}</WatchWithName>
-                          </>
+                          </WatchWithWrap>
                         );
                       })}
                       {movie.scheduleOwner === uid && (
-                        <>
+                        <IconWrap>
                           <DeleteIcon
                             onClick={() => {
                               deleteMovie(movie.event_doc_id);
@@ -175,24 +216,24 @@ function Info({
                           <EditLink to={`/edit/${movie.doc_id}`}>
                             <EditIcon />
                           </EditLink>
-                        </>
+                        </IconWrap>
                       )}
                     </Header>
 
                     <Wrap>
-                      <Link to={`/movie/${movie.movieInfo.id}`}>
-                        <MovieName>{movie.movieInfo.original_title}</MovieName>
+                      <Link to={`/movie/${movie.movieInfo?.id}`}>
+                        <MovieName>{movie.movieInfo?.original_title}</MovieName>
                       </Link>
                       <StarWrapper>
                         <DisplayStar
-                          starPoints={movie.movieInfo.vote_average}
+                          starPoints={movie.movieInfo?.vote_average}
                         />
                       </StarWrapper>
                       <SubInfo>
-                        Release Date | {movie.movieInfo.release_date}
+                        Release Date | {movie.movieInfo?.release_date}
                       </SubInfo>
-                      <SubInfo>Reviews | {movie.movieInfo.vote_count}</SubInfo>
-                      <OverView>{movie.movieInfo.overview}</OverView>
+                      <SubInfo>Reviews | {movie.movieInfo?.vote_count}</SubInfo>
+                      <OverView>{movie.movieInfo?.overview}</OverView>
                     </Wrap>
                   </Container>
                 );
@@ -219,7 +260,7 @@ const iconStyle = {
   },
 };
 const Mask = styled.section`
-  z-index: 1;
+  z-index: 2;
   position: absolute;
   top: 0;
   bottom: 0;
@@ -229,24 +270,24 @@ const Mask = styled.section`
 `;
 const Wrapper = styled.section`
   color: ${Color.Content};
-  width: 55%;
+  width: 70%;
   position: fixed;
   z-index: 2;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  height: 500px;
   box-shadow: 2px 3px 50px rgba(0, 0, 0, 0.7);
-  /* outline: 2px solid red; */
-  /* background-color: #fff; */
+  @media (max-width: 1000px) {
+    width: 90%;
+  }
 `;
 const Container = styled.main`
   padding: 20px 30px;
-  background-image: url(https://image.tmdb.org/t/p/w1280/${(props) =>
-    props.backdrop});
+  background-image: url(https://image.tmdb.org/t/p/w1280/${(props) => props.backdrop});
   background-size: cover;
   background-repeat: no-repeat;
   position: relative;
+  background-position: center;
   height: 500px;
   color: white;
   background-color: ${Color.Background};
@@ -256,8 +297,11 @@ const Container = styled.main`
     top: 0;
     bottom: 0;
     left: 0;
-    right: 0;
+    right: 40%;
     background: linear-gradient(90deg, ${Color.Background} 10%, transparent);
+  }
+  @media (max-width: 1000px) {
+    height: 400px;
   }
 `;
 const Header = styled.div`
@@ -265,8 +309,9 @@ const Header = styled.div`
   top: 0;
   display: flex;
   align-items: center;
-  & * {
-    margin-left: 10px;
+  @media (max-width: ${BreakPoint.sm}){
+    flex-direction: column;
+    align-items: flex-start;
   }
 `;
 const Wrap = styled.section`
@@ -274,6 +319,12 @@ const Wrap = styled.section`
   position: relative;
   top: 50%;
   transform: translateY(-50%);
+  @media (max-width: ${BreakPoint.lg}) {
+    max-width: 70%;
+  }
+  @media (max-width: ${BreakPoint.sm}){
+    max-width: 100%;
+  }
 `;
 const Day = styled.h3`
   color: ${Color.Main};
@@ -283,6 +334,15 @@ const DayOfWeek = styled.span`
   font-size: 1rem;
   margin-left: 10px;
 `;
+const WatchWithWrap = styled.div`
+  padding-top: 12px;
+  margin-left: 20px;
+  display: flex;
+  align-content: center;
+  @media (max-width: ${BreakPoint.sm}){
+    margin-left: 0;
+  }
+`;
 const WatchWithPic = styled.div`
   background-image: url(${(props) => props.photoURL});
   background-position: center;
@@ -291,23 +351,19 @@ const WatchWithPic = styled.div`
   border-radius: 50%;
   width: 25px;
   height: 25px;
-  margin-left: 20px;
 `;
 const WatchWithName = styled.p`
-  font-size: 1rem;
-  line-height: 1rem;
-  margin-right: auto;
-  margin-top: 14px;
-`;
-const WatchWithOthers = styled.span`
-  margin-left: 15px;
-  font-size: 1rem;
+  margin-left: 0.5rem;
 `;
 const MovieName = styled.h1`
   /* word-break: break-all; */
   word-break: break-word;
   font-size: 2.5rem;
   width: 100%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
 `;
 const StarWrapper = styled.div`
   display: flex;
@@ -323,19 +379,26 @@ const SubInfo = styled.span`
   font-weight: 200;
 `;
 const OverView = styled.p`
-  overflow-y: scroll;
-  height: 150px;
   letter-spacing: 1px;
   margin-top: 30px;
   font-weight: 300;
-  line-height: 1.6;
   /* word-break: break-all; */
-  word-break: break-word;
+  /* word-break: break-word; */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  @media (max-width: ${BreakPoint.sm}){
+    display: none;
+  }
 `;
-// const IconWrap = styled.div`
-//   display: flex;
-//   justify-content: center;
-// `;
+const IconWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  top: 10px;
+`;
 const DeleteIcon = styled(MdDelete)`
   ${iconStyle};
   margin-left: auto;

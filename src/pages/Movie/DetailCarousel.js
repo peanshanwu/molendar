@@ -1,32 +1,16 @@
 import HorizontalScroll from "react-horizontal-scrolling";
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
 import * as Color from "../../components/layout/Color";
 import styled from "styled-components";
-import DisplayStar from "../../components/common/DisplayStar";
-import { fetchCast } from "../../utils/api";
-// import Loading from '../../components/layout/Loading'
+import * as Title from "../../components/layout/Title"
+import * as BreakPoint from "../../components/layout/BreakPoints"
+
 
 function DetailCarousel({ castInfo }) {
-  // const movieId = useParams().id;
-  // const [castInfo, setCastInfo] = useState();
-
-  // useEffect(() => {
-  //   let isMount = true;
-  //   if (isMount) {
-  //     fetchCast(movieId).then((res) => {
-  //       console.log(res);
-  //       setCastInfo(res);
-  //     });
-  //   }
-  //   return () => {
-  //     isMount = false; // 清除fetchAPI
-  //   };
-  // }, []);
 
   return (
     <Wrapper>
-      <Title>Cast</Title>
+      <CastTitle>Cast</CastTitle>
       <HorizontalScroll>
         {castInfo?.cast.map((member) => {
           const url = member.profile_path
@@ -48,15 +32,16 @@ function DetailCarousel({ castInfo }) {
 
 const Wrapper = styled.section`
   position: relative;
-  padding-left: 12%;
-  padding-top: 65px;
-  height: 600px;
+  padding: 0 0 50px 8rem;
   color: ${Color.Content};
   background-color: ${Color.Background};
+  @media (max-width: ${BreakPoint.md}) {
+    padding: 0 2rem 50px;
+  }
 `;
-const Title = styled.h3`
-  font-size: 1.5rem;
-`;
+const CastTitle = styled(Title.Sub)`
+  margin-bottom: 0;
+`
 const Movie = styled.div`
   padding-top: 30px;
   width: 250px;
@@ -73,12 +58,6 @@ const Poster = styled.img`
   &:hover {
     transform: scale(1.05);
   }
-`;
-const StarWrapper = styled.div`
-  color: ${Color.Main};
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 5px;
 `;
 
 export default DetailCarousel;

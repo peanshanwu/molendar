@@ -1,20 +1,20 @@
 import "./pages/reset.css";
 import "./pages/base.css";
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 import Index from "./pages/Index/Index";
 import Personal from "./pages/Personal/Personal";
 import Signin from "./pages/Signin/Signin";
 import Movie from "./pages/Movie/Movie";
-import MovieList from "./pages/MovieList/MovieList";
+import SearchList from "./pages/SearchList/SearchList";
 import Edit from "./pages/Personal/Edit";
 import Collection from "./pages/Collection/Collection";
-import Search from "./components/layout/Search";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import Logo from "./components/layout/Logo";
 import firebase from "./utils/firebase";
 import { fetchMultiMovies } from "./utils/api";
+import NoMatch from "./pages/Others/NoMatch";
 
 // redux
 import { useDispatch } from "react-redux";
@@ -24,7 +24,8 @@ function App() {
   const dispatch = useDispatch();
   const db = firebase.firestore();
   const userRef = db.collection("users");
-  const [uid, setUid] = useState(null); //儲存uid，要改成redux
+  // const [uid, setUid] = useState(null); //儲存uid，要改成redux
+  const [uid, setUid] = useState(); //儲存uid，要改成redux
   const [user, setUser] = useState(null); //儲存uid，要改成redux
   const [userList, setUserList] = useState([]); // 所有user的資料
   const [myCalendarMovies, setMyCalendarMovies] = useState([]); // user_calendar底下所有電影
@@ -38,6 +39,7 @@ function App() {
       // setUid(currentUser.uid);
 
       if (currentUser) {
+        console.log(currentUser.uid);
         setUid(currentUser.uid);
       } else {
         setUid(null);
@@ -48,7 +50,6 @@ function App() {
   useEffect(() => {
     uid &&
       userRef.doc(uid).onSnapshot((doc) => {
-        console.log(doc.data());
         // setCurrentUserInfo(doc.data());
         dispatch(getCurrentUserInfo(doc.data()));
       });
@@ -82,7 +83,6 @@ function App() {
             snapshot.forEach((doc) => {
               myMoviesArr.push(doc.data());
             });
-            console.log(myMoviesArr);
             setMyCalendarMovies(myMoviesArr);
             fetchMultiMovies(myMoviesArr).then((movieInfo) => {
               setCalendarMovieInfo(movieInfo);
@@ -100,7 +100,6 @@ function App() {
       .then((snapshot) => {
         let userArr = [];
         snapshot.docs.forEach((user) => {
-          console.log(user.data());
           userArr.push(user.data());
         });
         setUserList(userArr);
@@ -126,8 +125,9 @@ function App() {
   //       });
   // }, [uid]);
 
+
   return (
-    <Router>
+    <>
       <Header user={user} />
       <Logo />
       <Switch>
@@ -146,13 +146,13 @@ function App() {
           <Signin uid={uid} />
         </Route>
         <Route exact path="/collection">
-          <Collection />
+          <Collection uid={uid} />
         </Route>
         <Route exact path="/movie/:id">
           <Movie uid={uid} userList={userList} />
         </Route>
-        <Route exact path="/movieList/:query">
-          <MovieList />
+        <Route exact path="/search/:query">
+          <SearchList />
         </Route>
         <Route exact path="/edit/:event_doc_id">
           <Edit
@@ -162,9 +162,12 @@ function App() {
             calendarMoviesInfo={calendarMoviesInfo}
           />
         </Route>
+        <Route path="*"> {/* path裡面是寫正則表達式 */}
+          <NoMatch />
+        </Route>
       </Switch>
       <Footer />
-    </Router>
+    </>
   );
 }
 

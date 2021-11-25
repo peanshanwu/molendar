@@ -11,13 +11,12 @@ export default function AddToCollection({ uid, movieId }) {
   const [collected, setCollected] = useState(false);
 
   useEffect(() => {
-    console.log(uid);
     uid &&
       userRef
         .doc(uid)
         .get()
         .then((doc) => {
-          setCollected(doc.data().user_collection.includes(movieId));
+          setCollected(doc.data().user_collection?.includes(movieId));
         });
   }, [uid]);
 
@@ -48,13 +47,13 @@ export default function AddToCollection({ uid, movieId }) {
   }
 
   return (
-    <Icon
-      onClick={() => {
-        clickAdd(movieId);
-      }}
-      collected={collected}
-    />
-  );
+    <>
+      {uid
+        ? <Icon onClick={() => clickAdd(movieId)} collected={collected} />
+        : null
+      }
+    </>
+  )
 }
 
 const iconStyle = {

@@ -46,7 +46,7 @@ export default function AddToCalendarIcon({ uid, selectDay, movieId }) {
       });
   }
 
-  return <AddToCalendar onClick={clickAdd} />;
+  return <> {uid ? <AddToCalendar onClick={clickAdd} /> : null} </> ;
 }
 
 const iconStyle = {

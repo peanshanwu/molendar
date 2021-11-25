@@ -6,9 +6,6 @@ import DisplayStar from "../../components/common/DisplayStar";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import * as Color from "../../components/layout/Color";
 
-function getRandomMovie(max) {
-  return Math.floor(Math.random() * max);
-}
 
 function DetailBanner({ movieDetail }) {
   const [clickTrailer, setClickTrailer] = useState(false);
@@ -32,7 +29,7 @@ function DetailBanner({ movieDetail }) {
           {clickTrailer ? (
             <Youtube
               // style={clickTrailer ? { display: "block" } : { display: "none" }}
-              src={`https://www.youtube.com/embed/${movieDetail.videos.results[0].key}`}
+              src={`https://www.youtube.com/embed/${movieDetail.videos.results[0].key}${autoplay}`}
               title="YouTube video player"
               frameBorder="0"
               allow="autoplay; encrypted-media"
@@ -58,8 +55,7 @@ function DetailBanner({ movieDetail }) {
 }
 
 const Wrapper = styled.section`
-  background-image: url(https://image.tmdb.org/t/p/w1280/${(props) =>
-    props.backdrop});
+  background-image: url(https://image.tmdb.org/t/p/w1280/${(props) => props.backdrop});
   /* background-size: contain; */
   background-size: cover;
   /* background-position: 100% 0; */
@@ -92,9 +88,6 @@ const StarWrapper = styled.div`
   margin-top: 30px;
   font-size: 20px;
   color: ${Color.Main};
-`;
-const StarIcon = styled(FaStar)`
-  margin-right: 5px;
 `;
 const SubInfo = styled.span`
   display: inline-block;

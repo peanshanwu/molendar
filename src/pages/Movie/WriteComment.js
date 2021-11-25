@@ -4,8 +4,11 @@ import * as Color from "../../components/layout/Color";
 import styled from "styled-components";
 import StarRating from "./StarRating";
 import firebase from "../../utils/firebase";
+import * as BreakPoint from "../../components/layout/BreakPoints";
 import { FaStar } from "react-icons/fa";
-import { IoLogoChrome } from "react-icons/io";
+
+import swal from "sweetalert";
+
 export default function WriteComment({ id, uid }) {
   const db = firebase.firestore();
   const commentRef = db.collection("user_comments");
@@ -37,7 +40,11 @@ export default function WriteComment({ id, uid }) {
             .doc(docRef.id)
             .set({ comment_id: docRef.id }, { merge: true });
 
-          window.alert("add comment!");
+          swal(`Add comment!`, {
+            icon: "success",
+            button: false,
+            timer: 1500,
+          });
           setComment("");
           setRating(0);
           setHover(0);
@@ -96,6 +103,9 @@ const CommentContainer = styled.article`
   justify-content: center;
   align-items: center;
   margin-bottom: 30px;
+  @media (max-width: ${BreakPoint.sm}) {
+    padding: 20px;
+  }
 `;
 const ContentContainer = styled.div`
   width: 100%;
@@ -115,6 +125,11 @@ const TextArea = styled.textarea`
 const Wrap = styled.div`
   display: flex;
   justify-content: space-between;
+  @media (max-width: ${BreakPoint.sm}) {
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: center;
+  }
 `;
 const SaveBtn = styled.div`
   width: 180px;
@@ -135,12 +150,17 @@ const SaveBtn = styled.div`
 const Container = styled.div`
   display: flex;
   align-items: flex-end;
+  @media (max-width: ${BreakPoint.sm}) {
+    justify-content: center;
+    margin-bottom: 10px;
+  }
 `;
 const StarIcon = styled(FaStar)`
   font-size: 1.2rem;
   margin-right: 5px;
 `;
 const RatingNum = styled.div`
+text-align: center;
   margin-left: 10px;
   font-size: 1.25rem;
   line-height: 1.5rem;

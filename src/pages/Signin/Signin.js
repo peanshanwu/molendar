@@ -1,19 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  useHistory,
-} from "react-router-dom";
+import {useHistory,} from "react-router-dom";
 import * as Color from "../../components/layout/Color";
 import calendarBackground from "../../image/index-calendar-bg.png";
+import { Main } from "../../components/layout/Container";
 import Loading from "../../components/layout/Loading";
 import firebase from "../../utils/firebase";
 import "firebase/auth";
 import socialMediaAuth from "../../utils/socialMediaAuth";
 import { googleProvider } from "../../utils/provider";
+import { AiFillGoogleCircle } from "react-icons/ai"
+import * as BreakPoint from "../../components/layout/BreakPoints"
 
 function Signin({ uid }) {
   //如果登入過，導到個人頁
@@ -32,17 +29,12 @@ function Signin({ uid }) {
   const [isLoading, setIsLoading] = useState(false);
 
   function saveUserToFirebase(user) {
-    console.log(user);
     let users = [];
     userRef.get().then((snapshot) => {
       snapshot.forEach((user) => {
         users.push(user.data().uid);
       });
-      console.log(users);
-      console.log(user.uid);
-      console.log(typeof user.uid);
       const hasUser = users.includes(user.uid);
-      console.log(hasUser);
       if (!hasUser) {
         userRef
           .doc(user.uid)
@@ -70,7 +62,6 @@ function Signin({ uid }) {
     setIsLoading(true);
     const response = await socialMediaAuth(provider);
     saveUserToFirebase(response);
-    console.log(response);
     setIsLoading(false);
     history.push("/");
   }
@@ -121,7 +112,6 @@ function Signin({ uid }) {
             friend_list: [],
             user_collection: [],
           });
-
           setIsLoading(false);
           history.push("/");
         })
@@ -144,65 +134,73 @@ function Signin({ uid }) {
   }
 
   return (
-    // 要做判斷，如果login狀態，就導到首頁
-
-    <Background>
-      <Container>
-        <Title>{activeItem ? "Login" : "Sign Up"}</Title>
-
-        <form
-          onSubmit={(e) => {
-            onSubmit(e);
-          }}
-        >
-          {activeItem ? (
-            <></>
-          ) : (
-            <NameInput
-              type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Name"
-            />
-          )}
-
-          <EmailInput
-            type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-          />
-          <PasswordInput
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password (at least six characters)"
-          />
-          {isLoading ? (
-            <Loading />
-          ) : (
-            <SubmitBtn type="submit">
-              {activeItem ? "Login" : "Sign Up"}
-            </SubmitBtn>
-          )}
-        </form>
-        <p>or</p>
-        <Google onClick={() => socialMediaClick(googleProvider)}>Google</Google>
-        <p
-          onClick={() => {
-            setErrorMessage("");
-            setActiveItem(!activeItem);
-          }}
-        >
-          or {activeItem ? "Sign Up" : "Login"}
-        </p>
-        {errorMessage && <Error>{errorMessage}</Error>}
-      </Container>
-    </Background>
+    <>
+      {uid === undefined ? <Loading /> :
+        <>
+          {isLoading
+            ? <Loading />
+            :
+            <Main>
+              <Background>
+                <Container>
+                  <Title>{activeItem ? "Login" : "Sign Up"}</Title>
+                  <form
+                    onSubmit={(e) => {
+                      onSubmit(e);
+                    }}
+                  >
+                    {activeItem ? (
+                      <></>
+                    ) : (
+                      <NameInput
+                        type="text"
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.target.value)}
+                        placeholder="Name"
+                      />
+                    )}
+                    <EmailInput
+                      type="text"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Email"
+                    />
+                    <PasswordInput
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Password (at least six characters)"
+                    />
+                    <SubmitBtn type="submit">
+                      {activeItem ? "Login" : "Sign Up"}
+                    </SubmitBtn>
+                  </form>
+                  <p>or</p>
+                  <GoogleWrap>
+                    <GoogleIcon />
+                    <Google onClick={() => socialMediaClick(googleProvider)}>Google</Google>
+                  </GoogleWrap>
+                  <p
+                    onClick={() => {
+                      setErrorMessage("");
+                      setActiveItem(!activeItem);
+                    }}
+                  >
+                    or {activeItem ? "Sign Up" : "Login"}
+                  </p>
+                  {errorMessage && <Error>{errorMessage}</Error>}
+                </Container>
+              </Background>
+            </Main>
+          }
+        </>
+      }
+    </>
   );
 }
 
 const inputStyle = {
+  fontSize: "1.1rem",
   borderRadius: "5px",
   border: "1px solid #ccc",
   padding: "5px 15px",
@@ -213,10 +211,8 @@ const inputStyle = {
     color: Color.LLight,
   },
 };
-
 const Background = styled.section`
-  padding-left: 160px;
-  height: calc(100vh - 130px);
+  min-height: calc(100vh - 130px);
   background-color: ${Color.Background};
   background-image: url(${calendarBackground});
   background-repeat: no-repeat;
@@ -226,13 +222,21 @@ const Background = styled.section`
   align-items: center;
 `;
 const Container = styled.div`
+  margin: 80px 0;
   border-radius: 10px;
   padding: 70px 50px;
   text-align: center;
-  width: 45%;
+  width: 50%;
   height: 500px;
   background-color: ${Color.Content};
   color: ${Color.Main};
+  @media (max-width: ${BreakPoint.lg}) {
+    width: 80%;
+  }
+  @media (max-width: ${BreakPoint.sm}) {
+    width: 100%;
+    padding: 70px 20px;
+  }
 `;
 const Title = styled.h3`
   font-weight: bold;
@@ -261,8 +265,22 @@ const SubmitBtn = styled.button`
   background-color: ${Color.Main};
   color: ${Color.Content};
 `;
+const GoogleWrap = styled.div`
+  margin: 10px auto 20px;
+  ${inputStyle};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  & button {
+    font-size: 1.1rem;
+    margin-left: 10px;
+  }
+`
 const Google = styled.button`
-  ${inputStyle}
+  border: 0;
 `;
+const GoogleIcon = styled(AiFillGoogleCircle)`
+  font-size: 1.6rem;
+`
 
 export default Signin;

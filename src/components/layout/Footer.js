@@ -3,30 +3,35 @@ import styled from "styled-components";
 import logo from "../../image/footer-logo.png";
 import { Link } from "react-router-dom";
 import * as Color from "./Color";
+import * as BreakPoint from "../../components/layout/BreakPoints"
 
 function Footer() {
   return (
-    <Container>
-      <LinkLogo to="/">
-        <FooterLogo src={logo}></FooterLogo>
-      </LinkLogo>
-      <Right>© 2021 Pean Shan Wu. All rights reserved.</Right>
-    </Container>
+      <Container>
+        <LinkLogo to="/">
+          <FooterLogo src={logo}></FooterLogo>
+        </LinkLogo>
+        <Right>© 2021 Pean Shan Wu. All rights reserved.</Right>
+      </Container>
   );
 }
-
 const Container = styled.footer`
-  padding: 30px 50px;
+  padding: 50px 0;
+  padding-left: 80px;
   color: ${Color.Content};
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  /* position: relative;
-  left: 80px; */
   width: 100%;
   height: 130px;
   background-color: ${Color.Background};
+  @media (max-width: ${BreakPoint.lg}) {
+    padding-left: 0;
+    height: 200px;
+    justify-content: flex-start;
+    text-align: center;
+  }
 `;
 const LinkLogo = styled(Link)`
   width: 130px;

@@ -7,6 +7,7 @@ import * as Color from "../../components/layout/Color";
 import styled from "styled-components";
 import Info from "./Info";
 import firebase from "../../utils/firebase";
+import * as BreakPoint from "../../components/layout/BreakPoints"
 import { fetchMultiMovies } from "../../utils/api.js";
 
 // setSelectDay={setSelectDay}
@@ -155,18 +156,12 @@ const PersonalCalendar = ({
                                 getMovieInfo(getMovieId(date.date))
                                   ?.original_title}
                             </MovieName>
-                            {/* <Poster
-                            src={
-                              calendarMoviesInfo.length !== 0 &&
-                              `https://image.tmdb.org/t/p/w500/${
-                                getMovieInfo(getMovieId(date.date))?.poster_path
-                              }`
-                            }
-                            alt=""
-                          /> */}
                           </MovieContainer>
                           {getMovieId(date.date).length > 1 ? (
-                            <More>More</More>
+                            <>
+                              <More>More</More>
+                              <MoreForPhone />
+                            </>
                           ) : null}
                         </>
                       )}
@@ -180,89 +175,6 @@ const PersonalCalendar = ({
       </Styled.PersonalCalendar>
     </>
   );
-  // return (
-  //   <>
-  //     <Info
-  //       uid={uid}
-  //       popupClick={popupClick}
-  //       setPopupClick={setPopupClick}
-  //       myCalendarMovies={myCalendarMovies}
-  //       calendarMoviesInfo={calendarMoviesInfo}
-  //       selectDay={selectDay}
-  //       userList={userList}
-  //     />
-
-  //     <Styled.PersonalCalendar>
-  //       <thead>
-  //         <tr>
-  //           <td colSpan="100%">
-  //             <PreMonthBtn onClick={calendar.setPreMonth}>◀</PreMonthBtn>
-  //             {format(startDay, "MMMM ")}
-  //             {format(startDay, "yyyy")}
-  //             <NextMonthBtn onClick={calendar.setNextMonth}>▶</NextMonthBtn>
-  //           </td>
-  //         </tr>
-  //       </thead>
-  //       <tbody>
-  //         <tr>
-  //           {WEEKS.map((title, i) => {
-  //             return <td key={i}>{title}</td>;
-  //           })}
-  //         </tr>
-  //         {calendar.days.map((week, i) => {
-  //           return (
-  //             <tr key={i}>
-  //               {week.map((date, i) => {
-  //                 const otherMonth = date.otherMonth;
-  //                 const isSelected = isSameDay(selectDay, date.date);
-  //                 const className = `${otherMonth && "other"} ${
-  //                   isSelected && "selected"
-  //                 }`;
-  //                 const selectedToday = () => {
-  //                   selectDate(date.date);
-  //                 };
-  //                 return (
-  //                   <td
-  //                     key={i}
-  //                     className={className}
-  //                     onClick={() => {
-  //                       selectedToday();
-  //                       if (getMovieId(date.date).length) {
-  //                         setPopupClick(true);
-  //                       }
-  //                     }}
-  //                   >
-  //                     {getDate(date.date)}
-
-  //                     {getMovieId(date.date).length !== 0 && (
-  //                       <MovieContainer>
-  //                         <Mask />
-  //                         <MovieName>
-  //                           {calendarMoviesInfo.length !== 0 &&
-  //                             getMovieInfo(getMovieId(date.date))
-  //                               ?.original_title}
-  //                         </MovieName>
-  //                         <Poster
-  //                           src={
-  //                             calendarMoviesInfo.length !== 0 &&
-  //                             `https://image.tmdb.org/t/p/w500/${
-  //                               getMovieInfo(getMovieId(date.date))?.poster_path
-  //                             }`
-  //                           }
-  //                           alt=""
-  //                         />
-  //                       </MovieContainer>
-  //                     )}
-  //                   </td>
-  //                 );
-  //               })}
-  //             </tr>
-  //           );
-  //         })}
-  //       </tbody>
-  //     </Styled.PersonalCalendar>
-  //   </>
-  // );
 };
 
 const PreMonthBtn = styled.button`
@@ -276,9 +188,6 @@ const NextMonthBtn = styled.button`
   color: ${Color.Content};
   font-size: 1.5rem;
   margin-left: 30px;
-`;
-const Poster = styled.img`
-  width: 100%;
 `;
 const DayNum = styled.p`
   position: absolute;
@@ -311,23 +220,48 @@ const Mask = styled.div`
 `;
 const MovieName = styled.h3`
   /* word-break: break-all; */
-  word-break: break-word;
+  /* word-break: break-word; */
   /* position: absolute; */
-  font-size: 1.5rem;
+  font-size: 1.4rem;
+  font-size: 300;
+  margin-top: 20px;
+  cursor: pointer;
+  @media (max-width: 1000px) {
+    display: none;
+  }
 `;
 const More = styled.p`
   width: 60%;
   font-size: 1rem;
-  font-weight: 300;
+  font-weight: 400;
   margin-top: 0;
   color: ${Color.Main};
-  /* background-color: rgba(0, 0, 0, 0.5); */
+  background-color: rgba(0, 0, 0, 0.5);
   border: 2px solid ${Color.Main};
   border-radius: 50px;
   position: absolute;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
+  cursor: pointer;
+  @media (max-width: ${BreakPoint.sm}) {
+    display: none;
+  }
 `;
+const MoreForPhone = styled.div`
+  display: none;
+  background-color: ${Color.Main};
+  width: 10px;
+  height: 10px;
+  border-radius: 50px;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  @media (max-width: ${BreakPoint.sm}) {
+    display: block
+  }
+`
 
 export default PersonalCalendar;

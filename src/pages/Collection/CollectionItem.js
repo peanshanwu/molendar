@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ImCross } from "react-icons/im";
 import * as Color from "../../components/layout/Color";
 import DisplayStar from "../../components/common/DisplayStar";
 import firebase from "../../utils/firebase";
+import * as BreakPoint from "../../components/layout/BreakPoints";
 
 export default function CollectionItem({ url, result, uid }) {
   const db = firebase.firestore();
@@ -55,18 +56,21 @@ const iconStyle = {
 
 const Movie = styled.div`
   position: relative;
-  /* padding-top: 30px; */
   width: 20.5%;
-  /* height: 400px; */
+  @media (max-width: ${BreakPoint.md}) {
+    width: 46%;
+  }
 `;
 const MovieName = styled.h3`
   margin-top: 10px;
   font-weight: 100;
-
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   overflow: hidden;
+  @media (max-width: ${BreakPoint.md}) {
+    font-size: 1.2rem;
+  }
 `;
 const Poster = styled.img`
   object-fit: cover;
@@ -84,6 +88,9 @@ const StarWrapper = styled.div`
   align-items: center;
   flex-wrap: wrap;
   margin-top: 5px;
+  @media (max-width: ${BreakPoint.md}) {
+    font-size: 1.1rem;
+  }
 `;
 const DeleteIcon = styled(ImCross)`
   ${iconStyle};

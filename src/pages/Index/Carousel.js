@@ -2,15 +2,15 @@ import HorizontalScroll from "react-horizontal-scrolling";
 import React from "react";
 import { Link } from "react-router-dom";
 import * as Color from "../../components/layout/Color";
+import * as BreakPoint from "../../components/layout/BreakPoints";
 import styled from "styled-components";
 import DisplayStar from "../../components/common/DisplayStar";
-// import Loading from '../../components/layout/Loading'
+import * as Title from "../../components/layout/Title";
 
 function Carousel({ upComingMovie }) {
   return (
     <Wrapper>
-      <Title>Upcoming Movies</Title>
-      {/* <Link to="/movieList">Explore All</Link> */}
+      <MainTitle>Upcoming Movies</MainTitle>
       <HorizontalScroll>
         {upComingMovie?.results.map((result) => {
           const url = result.poster_path
@@ -18,13 +18,13 @@ function Carousel({ upComingMovie }) {
             : `https://firebasestorage.googleapis.com/v0/b/molendar-shan.appspot.com/o/default_photo.png?alt=media&token=376c66cd-730d-44b7-a2f1-347999a60c02`;
 
           return (
-            <Link to={`/movie/${result.id}`}>
+            <Link to={`/movie/${result.id}`}>  {/* 手機版容易誤觸，看要不要把Link範圍縮小 */}
               <Movie>
                 <Poster src={url} key={result.id} alt={result.original_title} />
-                <MovieName>{result.original_title}</MovieName>
-                <StarWrapper>
-                  <DisplayStar starPoints={result.vote_average} />
-                </StarWrapper>
+                  <MovieName>{result.original_title}</MovieName>
+                  <StarWrapper>
+                    <DisplayStar starPoints={result.vote_average} />
+                  </StarWrapper>
               </Movie>
             </Link>
           );
@@ -40,10 +40,16 @@ const Wrapper = styled.section`
   height: 600px;
   color: ${Color.Content};
   background-color: ${Color.Background};
+  @media (max-width: ${BreakPoint.lg}) {
+    height: auto;
+    margin-bottom: 80px;
+  }
+  @media (max-width: ${BreakPoint.md}) {
+    padding: 0 2rem;
+  }
 `;
-const Title = styled.h3`
-  font-weight: 100;
-  font-size: 30px;
+const MainTitle = styled(Title.Sub)`
+  margin-bottom: 0;
 `;
 const Movie = styled.div`
   padding-top: 30px; /* 圖片放大時，上方才有空間 */
@@ -51,6 +57,7 @@ const Movie = styled.div`
   height: 400px;
 `;
 const MovieName = styled.h3`
+  font-size: 1.2rem;
   margin-top: 10px;
   font-weight: 100;
   display: -webkit-box;

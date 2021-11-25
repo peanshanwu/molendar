@@ -10,19 +10,12 @@ import DisplayStar from "../../components/common/DisplayStar";
 import AddToCalendarIcon from "../../components/common/AddToCalendar";
 import AddToCollection from "../../components/common/AddToCollection";
 import { Waypoint } from "react-waypoint";
-import ReactHover, { Trigger, Hover } from "react-hover";
+import * as Title from "../../components/layout/Title"
+import * as BreakPoint from "../../components/layout/BreakPoints"
 
 const posterURL = "https://image.tmdb.org/t/p/w500";
 
 const MovieInfo = ({ uid, selectDay, nowPlayingMovie, setShowScroll }) => {
-  const [clickTrailer, setClickTrailer] = useState(false);
-  const [autoplay, setAutoplay] = useState("");
-  const [isHoverPoster, setIsHoverPoster] = useState(false);
-
-  function clickPlay() {
-    setClickTrailer(true);
-    setAutoplay("?autoplay=1");
-  }
 
   function nowIsPlaying(resultReleaseDate) {
     const formatSelectDay = format(selectDay, "yyyy-MM-dd")
@@ -40,6 +33,7 @@ const MovieInfo = ({ uid, selectDay, nowPlayingMovie, setShowScroll }) => {
 
   return (
     <Wrapper>
+      <Title.Sub>Now Playing Movie</Title.Sub>
       {nowPlayingMovie.results.map((result, i) => {
         if (nowIsPlaying(result.release_date)) {
           return (
@@ -54,32 +48,10 @@ const MovieInfo = ({ uid, selectDay, nowPlayingMovie, setShowScroll }) => {
                   }}
                 />
               ) : null}
-              {/* 還要再寫判斷式去拿到該 movie_id 的 trailer_key */}
-              {/* 還要再寫infinite scroll */}
-              {/* <Youtube
-                style={
-                  clickTrailer ? { display: "block" } : { display: "none" }
-                }
-                src={`https://www.youtube.com/embed/jU8VNQKKF-g`}
-                title="YouTube video player"
-                frameBorder="0"
-                allow="autoplay; encrypted-media"
-                allowFullScreen
-              /> */}
-              {/* {i === isHoverPoster ? (
-                <Trailer
-                  id={result.id}
-                  onMouseLeave={() => setIsHoverPoster(false)}
-                  onClick={clickPlay}
-                >
-                  <PlayIcon />
-                </Trailer>
-              ) : null} */}
-
               <Wrap>
                 <Poster
                   src={`${posterURL}${result.poster_path}`}
-                  onMouseEnter={() => setIsHoverPoster(i)}
+                  // onMouseEnter={() => setIsHoverPoster(i)}
                 />
                 <IconWrap>
                   <AddToCalendarIcon
@@ -110,6 +82,7 @@ const MovieInfo = ({ uid, selectDay, nowPlayingMovie, setShowScroll }) => {
 const Wrapper = styled.div`
   position: relative;
   padding-bottom: 150px;
+  padding-left: 8rem;
   height: 700px;
   overflow-y: scroll;
   color: white;
@@ -120,11 +93,29 @@ const Wrapper = styled.div`
   &::-webkit-scrollbar {
     display: none;
   }
+
+  @media (max-width: ${BreakPoint.sm}) {
+    padding: 2rem;
+  }
+
 `;
 const Info = styled.div`
   margin-top: 50px;
   padding-bottom: 50px;
-  width: 650px;
+  width: 860px;
+  @media (max-width: 1600px) {
+    width: 500px;
+  }
+  @media (max-width: ${BreakPoint.lg}) {
+    width: 360px;
+  }
+  @media (max-width: 1000px) {
+    width: 100%;
+    padding-right: 8rem;
+  }
+  @media (max-width: ${BreakPoint.sm}) {
+    padding-right: 0;
+  }
 `;
 const Wrap = styled.div`
   display: flex;
@@ -139,35 +130,12 @@ const Poster = styled.img`
   width: 232px;
   height: 348px;
 `;
-const Trailer = styled.div`
-  position: absolute;
-  width: 232px;
-  height: 348px;
-  background-color: rgba(0, 0, 0, 0.5);
-`;
-const PlayIcon = styled(BsFillPlayCircleFill)`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 40px;
-`;
-const Youtube = styled.iframe`
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 999;
-  width: 80vw;
-  height: 80vh;
-`;
 const LinkTo = styled(Link)`
   width: 100%;
   display: inline-block;
 `;
-const MovieName = styled.h2`
+const MovieName = styled(Title.Third)`
   margin-top: 40px;
-  font-size: 30px;
 `;
 const StarWrapper = styled.div`
   display: flex;

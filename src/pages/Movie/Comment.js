@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import DisplayStar from "../../components/common/DisplayStar";
 import firebase from "../../utils/firebase";
 
+
 export default function Comment({ info, uid, id }) {
   const db = firebase.firestore();
   const commentRef = db.collection("user_comments");

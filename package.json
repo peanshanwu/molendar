@@ -26,6 +26,7 @@
     "slick-carousel": "^1.8.1",
     "styled-components": "^5.3.3",
     "sweetalert": "^2.1.2",
+    "uuid": "^8.3.2",
     "web-vitals": "^1.1.2"
   },
   "scripts": {
@@ -52,8 +53,5 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {
-    "prettier": "^2.4.1",
-    "prettier-eslint": "^13.0.0"
-  }
+  "devDependencies": {}
 }
