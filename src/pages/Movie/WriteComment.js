@@ -145,6 +145,9 @@ const SaveBtn = styled.div`
     color: ${Color.Main};
     box-shadow: 0 0 30px rgba(0, 204, 204, 0.5);
   }
+  @media (max-width: ${BreakPoint.sm}) {
+    align-self: center;
+  }
 `;
 
 const Container = styled.div`
@@ -160,7 +163,7 @@ const StarIcon = styled(FaStar)`
   margin-right: 5px;
 `;
 const RatingNum = styled.div`
-text-align: center;
+  text-align: center;
   margin-left: 10px;
   font-size: 1.25rem;
   line-height: 1.5rem;

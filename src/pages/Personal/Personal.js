@@ -18,11 +18,6 @@ import MovieInvite from "./MovieInvite";
 import * as BreakPoint from "../../components/layout/BreakPoints";
 
 function Personal({ uid, userList, myCalendarMovies, calendarMoviesInfo }) {
-  // 如果沒有登入導到首頁
-  // const history = useHistory();
-  // if (!uid) {
-  //   history.push("/");
-  // }
 
   const db = firebase.firestore();
   const userRef = db.collection("users");
@@ -134,6 +129,9 @@ function Personal({ uid, userList, myCalendarMovies, calendarMoviesInfo }) {
     };
   }, [uid, userList]);
 
+
+  console.log(movieInviteInfo);
+
   return (
     <>
       {isLoading ? (
@@ -166,6 +164,7 @@ function Personal({ uid, userList, myCalendarMovies, calendarMoviesInfo }) {
                           <MovieInvite
                             uid={uid}
                             movieInviteInfo={movieInviteInfo}
+                            setMovieInviteInfo={setMovieInviteInfo}
                           />
                         )}
                       </Div2>
@@ -189,17 +188,6 @@ function Personal({ uid, userList, myCalendarMovies, calendarMoviesInfo }) {
   );
 }
 
-const iconStyle = {
-  fontSize: "1.5rem",
-  color: Color.Main,
-  cursor: "pointer",
-  transition: ".3s ease",
-  "&:hover": {
-    color: Color.Content,
-    WebkitFilter: "drop-shadow(0 0 5px rgba(0, 204, 204, 1))",
-    filter: "drop-shadow(0 0 5px rgba(0, 204, 204, 1))",
-  },
-};
 const Background1 = styled.section`
   width: 100%;
   height: 280px;

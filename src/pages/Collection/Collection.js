@@ -8,19 +8,13 @@ import * as Title from "../../components/layout/Title";
 import * as Container from "../../components/layout/Container";
 import Loading from "../../components/layout/Loading";
 import { v4 as uuidv4 } from 'uuid';
+import * as BreakPoint from "../../components/layout/BreakPoints"
 
 // redux
 import { useSelector } from "react-redux";
 
 export default function Collection({ uid }) {
-  const history = useHistory();
-  if (!uid) {
-    window.alert("please Login first, thank you");
-    history.push("/");
-  }
 
-  console.log(uid);
-  
   const [isLoading, setIsLoading] = useState(true);
   const [collectionInfo, setCollectionInfo] = useState();
   const currentUserInfo = useSelector((state) => state.currentUserInfo);
@@ -69,7 +63,7 @@ export default function Collection({ uid }) {
             ) : (
               <NoItem>
                 Sorry, you don't have collection <span> ...</span>
-                <Link to={`/`}> | Back to index</Link>
+                <Link to={`/`}>  Back to index</Link>
               </NoItem>
             )}
           </Wrap>
@@ -80,22 +74,6 @@ export default function Collection({ uid }) {
   );
 }
 
-// const Wrapper = styled.section`
-//   color: ${Color.Content};
-//   position: relative;
-//   width: 100%;
-//   min-height: calc(100vh - 130px);
-//   background-color: ${Color.Background};
-// `;
-// const Main = styled.main`
-//   width: calc(100% - 80px);
-//   position: relative;
-//   left: 80px;
-//   @media (max-width: ${BreakPoint.lg}) {
-//     width: 100%;
-//     position: static;
-//   }
-// `;
 const Wrap = styled(Container.MaxWidthContainer)`
   color: ${Color.Content};
   max-width: 1000px;
@@ -111,11 +89,16 @@ const NoItem = styled.div`
   color: ${Color.Dark};
   font-weight: 100;
   font-size: 1.25rem;
-  /* background-color: ${Color.Sub}; */
+  @media (max-width: ${BreakPoint.sm}) {
+    flex-direction: column;
+    text-align: center;
+  }
 `;
 const FlexWrap = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
+  --webkit-row-gap: 10vh;
+  --webkit-column-gap: 5.7%;
   gap: 10vh 5.7%;
 `;

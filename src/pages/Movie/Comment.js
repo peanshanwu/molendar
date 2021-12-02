@@ -6,6 +6,7 @@ import { ImCross } from "react-icons/im";
 import { format } from "date-fns";
 import DisplayStar from "../../components/common/DisplayStar";
 import firebase from "../../utils/firebase";
+import * as BreakPoint from "../../components/layout/BreakPoints"
 
 
 export default function Comment({ info, uid, id }) {
@@ -94,14 +95,22 @@ const CommentContainer = styled.article`
   background-color: ${Color.Sub};
   margin-bottom: 30px;
   transition: ease-in-out 0.3s;
+  @media (max-width: ${BreakPoint.sm}) {
+    padding: 20px;
+  }
 `;
 const ContentContainer = styled.div`
   display: flex;
+  --webkit-row-gap: 5%;
+  --webkit-column-gap: 5%;
   gap: 5%;
   justify-content: center;
   align-items: center;
   width: 100%;
   margin: 0 auto;
+  @media (max-width: ${BreakPoint.sm}) {
+    flex-direction: column;
+  }
 `;
 const UserWrap = styled.div`
   width: 25%;
@@ -109,6 +118,9 @@ const UserWrap = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  @media (max-width: ${BreakPoint.sm}) {
+    width: 100%;
+  }
 `;
 const Pic = styled.img`
   width: 2.5rem;
@@ -127,6 +139,10 @@ const TextContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  @media (max-width: ${BreakPoint.sm}) {
+    width: 100%;
+    justify-content: center;
+  }
 `;
 const Text = styled.p`
   width: 100%;
@@ -143,6 +159,10 @@ const Time = styled.p`
   font-size: 0.8rem;
   color: ${Color.Light};
   margin-bottom: 5px;
+  @media (max-width: ${BreakPoint.sm}) {
+    width: 100%;
+    text-align: center;
+  }
 `;
 const ReadMore = styled.div`
   text-align: center;
@@ -158,6 +178,10 @@ const ReadMore = styled.div`
     background-color: ${Color.Dark};
     color: ${Color.Content};
     /* box-shadow: 0 0 5px rgba(0, 204, 204, 1); */
+  }
+  @media (max-width: ${BreakPoint.sm}) {
+    width: 100%;
+    order: 4;
   }
 `;
 const DeleteIcon = styled(ImCross)`
@@ -177,4 +201,7 @@ const StarWrapper = styled.div`
   font-size: 1.2rem;
   line-height: 1;
   margin-bottom: 5px; /* 視覺微調 */
+  @media (max-width: ${BreakPoint.sm}) {
+    margin-bottom: 30px;
+  }
 `;

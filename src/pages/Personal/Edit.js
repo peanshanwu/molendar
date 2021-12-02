@@ -289,10 +289,10 @@ function Edit({ uid, myCalendarMovies, userList, calendarMoviesInfo }) {
   }
   function removeInvite(removeUid) {
     swal(
-      "Remove the movie invitation",
+      "It will remove the movie invitation",
       `once you save, it will remove the invitation`,
       "info",
-      { buttons: false, timer: 2500 }
+      { buttons: false, timer: 3500 }
     );
     setInviteInfo(inviteInfo.filter((invite) => removeUid !== invite.uid));
     const removeItemInfo = userList.find(
@@ -303,10 +303,10 @@ function Edit({ uid, myCalendarMovies, userList, calendarMoviesInfo }) {
 
   function sendWatchInvitation(uid) {
     swal(
-      "Send the movie invitation",
+      "It will send the movie invitation",
       `once you save, it will send the invitation`,
       "info",
-      { buttons: false, timer: 2500 }
+      { buttons: false, timer: 3500 }
     );
     const userInfo = userList.find((user) => user.uid === uid);
     setInviteInfo((inviteInfo) => [...inviteInfo, userInfo]);
