@@ -114,6 +114,8 @@ const FlexWrap = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
+  --webkit-row-gap: 10vh;
+  --webkit-column-gap: 5.7%;
   gap: 10vh 5.7%;
 `;
 const Movie = styled.div`

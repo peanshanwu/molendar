@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import * as Color from "../../components/layout/Color";
 import styled from "styled-components";
-import Loading from "../../components/layout/Loading";
 import firebase from "../../utils/firebase";
 import Comment from "./Comment";
 import LoginFirst from "./LoginFirst";
 import Banner from "../../components/common/Banner"
 import WriteComment from "./WriteComment";
-import DetailBanner from "./DetailBanner";
 import DetailCarousel from "./DetailCarousel";
 import { fetchMovie, fetchCast } from "../../utils/api";
 import AddToCalendarIcon from "../../components/common/AddToCalendar";
@@ -28,6 +26,8 @@ function Movie({ uid, userList }) {
   const db = firebase.firestore();
   const commentRef = db.collection("user_comments");
   const [commentInfo, setCommentInfo] = useState(null);
+
+  const history = useHistory()
 
   // comment state
   useEffect(() => {
@@ -65,7 +65,11 @@ function Movie({ uid, userList }) {
     let isMount = true;
     if (isMount) {
       fetchCast(id).then((res) => {
-        setCastInfo(res);
+        if (res.status_code === 34) {
+          history.push("/no-match")
+        } else {
+          setCastInfo(res);
+        }
       });
     }
     return () => {
@@ -77,56 +81,17 @@ function Movie({ uid, userList }) {
     let isMount = true;
     if (isMount) {
       fetchMovie(id).then((res) => {
-        setMovieDetail(res);
+        if (res.status_code === 34) {
+          history.push("/no-match")
+        } else {
+          setMovieDetail(res);
+        }
       });
     }
     return () => {
       isMount = false; // 清除fetchAPI
     };
   }, []);
-
-  // const posterURL = movieDetail?.poster_path
-  //   ? `https://image.tmdb.org/t/p/w500${movieDetail.poster_path}`
-  //   : `https://firebasestorage.googleapis.com/v0/b/molendar-shan.appspot.com/o/default_photo.png?alt=media&token=376c66cd-730d-44b7-a2f1-347999a60c02`;
-
-  // function getGenres() {
-  //   let genresArr = [];
-  //   if (movieDetail) {
-  //     movieDetail.genres.forEach((genres) => {
-  //       genresArr.push(genres.name);
-  //     });
-  //   }
-  //   return genresArr;
-  // }
-
-  // function getProduction() {
-  //   let productArr = [];
-  //   if (movieDetail) {
-  //     movieDetail.production_companies.forEach((product) => {
-  //       productArr.push(product.name);
-  //     });
-  //   }
-  //   return productArr;
-  // }
-
-  // function timeConvert(n) {
-  //   var num = n;
-  //   var hours = num / 60;
-  //   var rhours = Math.floor(hours);
-  //   var minutes = (hours - rhours) * 60;
-  //   var rminutes = Math.round(minutes);
-  //   return `${rhours}h ${rminutes}min`;
-  // }
-
-  // function findDirector() {
-  //   let directorName = "";
-  //   castInfo.crew.forEach((crew) => {
-  //     if (crew.job === "Director") {
-  //       directorName = crew.name;
-  //     }
-  //   });
-  //   return directorName;
-  // }
   
   return (
     <>
@@ -187,40 +152,6 @@ const Container = styled(MaxWidthContainer)`
   word-break: break-all;
   color: ${Color.Content};
 `;
-const InfoWrap = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 3rem;
-`;
-const Poster = styled.img`
-  width: 25%;
-  background-color: ${Color.Background};
-`;
-const ContentWrap = styled.div`
-  width: 75%;
-  font-weight: 100;
-`;
-const Storyline = styled.h5`
-  font-size: 1.4rem;
-  margin-bottom: 10px;
-`;
-const StorylineInfo = styled.p`
-  margin-bottom: 30px;
-`;
-const Wrap1 = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-const Wrap2 = styled.div`
-  display: flex;
-`;
-const DetailTitle = styled.h6`
-  min-width: 70px;
-  width: 15%;
-`;
-const DetailContent = styled.p`
-  width: 80%;
-`;
+
 
 export default Movie;

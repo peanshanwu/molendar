@@ -97,6 +97,8 @@ function MovieIntro({ movieDetail, castInfo }) {
 const InfoWrap = styled.div`
   display: flex;
   align-items: flex-start;
+  --webkit-row-gap: 3rem;
+  --webkit-column-gap: 3rem;
   gap: 3rem;
 `;
 const Poster = styled.img`
@@ -123,6 +125,8 @@ const StorylineInfo = styled.p`
 const Wrap1 = styled.div`
   display: flex;
   flex-direction: column;
+  --webkit-row-gap: 0.5rem;
+  --webkit-column-gap: 0.5rem;
   gap: 0.5rem;
 `;
 const Wrap2 = styled.div`

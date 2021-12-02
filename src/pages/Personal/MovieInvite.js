@@ -10,7 +10,8 @@ import "slick-carousel/slick/slick-theme.css";
 import { acceptMovieInvitation, cancelMovieInvitation } from "../../utils/operateFirebase";
 import { v4 as uuidv4 } from 'uuid';
 
-function MovieInvite({ uid, movieInviteInfo }) {
+// function MovieInvite({ uid, movieInviteInfo }) {
+function MovieInvite({ uid, movieInviteInfo, setMovieInviteInfo }) {
   
   // slider
   const settings = {
@@ -76,14 +77,18 @@ function MovieInvite({ uid, movieInviteInfo }) {
                       invitation.event_doc_id,
                       invitation.date,
                       invitation.movieInfo.id,
-                      uid
+                      uid,
+                      movieInviteInfo,
+                      setMovieInviteInfo
                     );
                   }}
                 />
                 <Cansel
                   onClick={() => {
                     cancelMovieInvitation(
-                      invitation.invitation_id
+                      invitation.invitation_id,
+                      movieInviteInfo,
+                      setMovieInviteInfo
                     );
                   }}
                 />

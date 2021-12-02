@@ -12,12 +12,9 @@ import { googleProvider } from "../../utils/provider";
 import { AiFillGoogleCircle } from "react-icons/ai"
 import * as BreakPoint from "../../components/layout/BreakPoints"
 
-function Signin({ uid }) {
-  //如果登入過，導到個人頁
+function Signin() {
+
   const history = useHistory();
-  if (uid) {
-    history.push("/personal");
-  }
 
   const db = firebase.firestore();
   const userRef = db.collection("users");
@@ -134,8 +131,7 @@ function Signin({ uid }) {
   }
 
   return (
-    <>
-      {uid === undefined ? <Loading /> :
+    
         <>
           {isLoading
             ? <Loading />
@@ -144,14 +140,10 @@ function Signin({ uid }) {
               <Background>
                 <Container>
                   <Title>{activeItem ? "Login" : "Sign Up"}</Title>
-                  <form
-                    onSubmit={(e) => {
-                      onSubmit(e);
-                    }}
-                  >
-                    {activeItem ? (
-                      <></>
-                    ) : (
+                  <form onSubmit={(e) => onSubmit(e)}>
+                  {activeItem
+                    ? null
+                    : (
                       <NameInput
                         type="text"
                         value={displayName}
@@ -193,9 +185,7 @@ function Signin({ uid }) {
               </Background>
             </Main>
           }
-        </>
-      }
-    </>
+      </>
   );
 }
 

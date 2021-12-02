@@ -75,14 +75,17 @@ export function acceptMovieInvitation(
   event_doc_id,
   date,
   movie_id,
-  uid
+  uid,
+  movieInviteInfo,
+  setMovieInviteInfo
 ) {
+  console.log("Accept!");
   // 刪除電影邀請
   movieInviteRef
     .doc(invitation_id)
     .delete()
     .then(() => {
-      console.log("movie invite delete");
+      console.log(" Hi! movie invite delete");
     });
 
   db.collectionGroup("user_calendar")
@@ -125,9 +128,13 @@ export function acceptMovieInvitation(
             .set({ doc_id: docRef.id }, { merge: true });
         });
     });
+    
+  if (movieInviteInfo.length === 1) {
+    setMovieInviteInfo([])
+  }
 }
 
-export function cancelMovieInvitation(invitation_id) {
+export function cancelMovieInvitation(invitation_id, movieInviteInfo, setMovieInviteInfo) {
   swal({
     title: "Reject this invitation?",
     text: "Once you reject, you will not be able to recover!",
@@ -141,6 +148,9 @@ export function cancelMovieInvitation(invitation_id) {
       swal("Cansel", {
         icon: "success",
       });
+      if (movieInviteInfo.length === 1) {
+        setMovieInviteInfo([])
+      }
     } else {
       swal("Maybe think about it is right!", { button: false, timer: 1500 });
     }

@@ -10,9 +10,9 @@ import * as BreakPoint from "../layout/BreakPoints"
 function Banner({ movieData, trailerKey }) {
   const [clickTrailer, setClickTrailer] = useState(false);
   const [autoplay, setAutoplay] = useState("");
-  let youtubeURL = "";
+  let youtubeURL = `https://www.youtube.com/embed/`;
 
-  if ("videos" in movieData) {
+  if ("videos" in movieData && movieData.videos.results.length > 0) {
     youtubeURL = `https://www.youtube.com/embed/${movieData.videos.results[0].key}${autoplay}`
   } else {
     youtubeURL = `https://www.youtube.com/embed/${trailerKey}${autoplay}`
