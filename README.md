@@ -1,70 +1,88 @@
-# Getting Started with Create React App
+# Molendar
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Demo
+* Link: https://molendar-shan.web.app/
+* **Test Account**
+    User-1: test1@gmail.com
+    Password: 111111
+    User-2: test2@gmail.com
+    Password: 222222
+## Technologies
+* Fundamental
+    * HTML5 / CSS3 / JavaScript ES6
+    * Responsive Web Design
+* Frameworks
+    * React
+    * Hooks
+    * React Router
+    * Redux / Redux
+* Firebase
+    * Authentication
+    * Firestore
+    * Hosting
+* Packages
+    * react-waypoint
+    * react-slick
+    * styled-components
+    * sweetalert
+    * uuid
+    * iso-language-converter
+* Third Party Libraries
+    * date-fns
+## Function Map
+![molendar-flow-chart](https://user-images.githubusercontent.com/62551122/144372150-2b45408b-a879-46eb-aff6-02573d8e6ece.png)
 
-## Available Scripts
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+* **Check the Nowplaying movies by click the date.**
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+https://user-images.githubusercontent.com/62551122/144372030-9f8903d9-fa90-408d-a103-63f86e7e2069.mov
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+* **Add to Calendar**
 
-### `npm run build`
+https://user-images.githubusercontent.com/62551122/144371962-5c17c3e6-f18b-450e-93cf-f7f6447e84a8.mov
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+* **Add to Collection**
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+https://user-images.githubusercontent.com/62551122/144371984-9a0142bd-decd-4d7e-b7b2-b4e01fda299d.mov
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+* **Friend Request**
 
-### `npm run eject`
+https://user-images.githubusercontent.com/62551122/144371951-68cbcb5c-9e21-45d4-bc9e-7c75b5507aee.mov
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+* **Accept Friend**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+https://user-images.githubusercontent.com/62551122/144373288-1a93db66-2ebd-4069-a534-ae7857f1c0a2.mov
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-## Learn More
+* **Edit movie schedule**
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+    * Edit Date
+    
+    https://user-images.githubusercontent.com/62551122/144371997-dc199eed-7aa1-4c8f-8f9a-4eccae830d8a.mov
+    
+    * Send Movie Invitation to Friend / Accept Movie Invitation
+    
+    https://user-images.githubusercontent.com/62551122/144372018-17f6d056-bf09-4286-ab77-c3628546cebf.mov
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+    * Remove Watch With
+    
+    https://user-images.githubusercontent.com/62551122/144372040-5a0f6aa4-d975-4709-81f4-aa3b99b0e454.mov
 
-### Code Splitting
+    * Search Moive
+    
+    https://user-images.githubusercontent.com/62551122/144372071-63fa3b64-8f29-4234-9a3c-94bedf628c1e.mov
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-### Analyzing the Bundle Size
+## Future Features
+* Click calendar and add movie schedule directly
+* Search friends by name
+* Add notification feature
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Contact
+* Author: Pean Shan, Wu
+* Email: peanshan@gmail.com
