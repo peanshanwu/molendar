@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import * as Color from "../../components/layout/Color";
 import { format, isSameDay } from "date-fns";
@@ -23,7 +23,6 @@ function Info({
   userList,
 }) {
   const db = firebase.firestore();
-  const history = useHistory();
   const userRef = db.collection("users");
   const movieRef = db.collection("movie_invitations");
   const settings = {
@@ -36,7 +35,7 @@ function Info({
 
   const [selectDayOfMyMovies, setSelectDayOfMyMovies] = useState([]); // 選取該日期的電影行程資料
   const [selectDayOfMoviesInfo, setSelectDayOfMoviesInfo] = useState([]); // 根據選取日電影行程比對出來的電影資訊
-  const [watchWithUserInfo, setWatchWithUserInfo] = useState([]);
+
 
   useEffect(() => {
     if (popupClick) {
@@ -87,18 +86,13 @@ function Info({
         const watchWithNoCurrentUser = schedule.watchWith.filter(
           (watchWith) => watchWith !== uid
         );
-        console.log(schedule.watchWith);
-        console.log(watchWithNoCurrentUser);
         watchWithInfoArr = watchWithNoCurrentUser.map((watchWith) => {
           return userList.find((user) => watchWith === user.uid);
         });
-        console.log(userList);
-        console.log(watchWithInfoArr);
         movieScheduleObj.watchWith = watchWithInfoArr; // 根據watchWith id array，轉換成info，存入obj的watchWith欄位
 
         return movieScheduleObj;
       });
-      console.log(`movieInfos`, movieInfos);
       setSelectDayOfMoviesInfo(movieInfos);
     }
   }, [selectDayOfMyMovies]);
@@ -119,9 +113,6 @@ function Info({
           .then((querySnapshot) => {
             querySnapshot.forEach((docRef) => {
               const docData = docRef.data();
-              console.log(docData);
-              console.log(docData.uid);
-              console.log(docData.doc_id);
               userRef
                 .doc(docData.uid)
                 .collection("user_calendar")
@@ -150,36 +141,6 @@ function Info({
         swal("Maybe think about it is right!", { button: false, timer: 1500 });
       }
     });
-
-    // // 所有行程刪除
-    // db.collectionGroup("user_calendar")
-    //   .where("event_doc_id", "==", delete_doc_id)
-    //   .get()
-    //   .then((querySnapshot) => {
-    //     querySnapshot.forEach((docRef) => {
-    //       const docData = docRef.data();
-    //       console.log(docData);
-    //       console.log(docData.uid);
-    //       console.log(docData.doc_id);
-    //       userRef
-    //         .doc(docData.uid)
-    //         .collection("user_calendar")
-    //         .doc(docData.doc_id)
-    //         .delete();
-    //     });
-    //     setPopupClick(false);
-    //   });
-
-    // // 邀請刪除
-    // movieRef
-    //   .where("event_doc_id", "==", delete_doc_id)
-    //   .get()
-    //   .then((querySnapshot) => {
-    //     querySnapshot.forEach((docRef) => {
-    //       const docData = docRef.data();
-    //       movieRef.doc(docData.doc_id).delete();
-    //     });
-    //   });
   }
 
   return (
@@ -412,16 +373,5 @@ const EditLink = styled(Link)`
   padding-top: 4px;
   display: inline-block;
 `;
-// const Gradient = styled.div`
-//   /* display: flex; */
-//   /* align-items: center; */
-//   /* padding-top: 150px; */
-//   width: 100%;
 
-//   height: 100%;
-//   /* position: relative;
-//   top: 40%; */
-//   background: linear-gradient(90deg, ${Color.Background} 10%, transparent);
-//   color: ${Color.Content};
-// `;
 export default Info;

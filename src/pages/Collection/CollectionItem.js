@@ -13,7 +13,6 @@ export default function CollectionItem({ url, result, uid }) {
   const [hover, setHover] = useState(false);
 
   function deleteComment(movieId) {
-    console.log(movieId);
     userRef.doc(uid).update({
       user_collection: firebase.firestore.FieldValue.arrayRemove(movieId),
     });

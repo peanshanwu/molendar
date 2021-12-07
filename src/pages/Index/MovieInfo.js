@@ -1,18 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import * as Color from "../../components/layout/Color";
 import { format, isAfter } from "date-fns";
-import { IoMdAddCircle } from "react-icons/io";
-import { IoHeartCircleSharp } from "react-icons/io5";
-import { BsFillPlayCircleFill } from "react-icons/bs";
 import DisplayStar from "../../components/common/DisplayStar";
 import AddToCalendarIcon from "../../components/common/AddToCalendar";
 import AddToCollection from "../../components/common/AddToCollection";
 import { Waypoint } from "react-waypoint";
 import * as Title from "../../components/layout/Title"
 import * as BreakPoint from "../../components/layout/BreakPoints"
-
+import { v4 as uuidv4 } from 'uuid';
 const posterURL = "https://image.tmdb.org/t/p/w500";
 
 const MovieInfo = ({ uid, selectDay, nowPlayingMovie, setShowScroll }) => {
@@ -37,7 +33,7 @@ const MovieInfo = ({ uid, selectDay, nowPlayingMovie, setShowScroll }) => {
       {nowPlayingMovie.results.map((result, i) => {
         if (nowIsPlaying(result.release_date)) {
           return (
-            <Info>
+            <Info key={uuidv4()}>
               {i === 0 ? (
                 <Waypoint
                   onLeave={() => {

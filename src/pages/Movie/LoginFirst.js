@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import * as Color from "../../components/layout/Color";
 import styled from "styled-components";
+import * as BreakPoint from "../../components/layout/BreakPoints"
 
 export default function LoginFirst() {
   return (
@@ -25,6 +26,9 @@ const CommentContainer = styled.article`
   justify-content: center;
   align-items: center;
   margin-bottom: 30px;
+  @media (max-width: ${BreakPoint.sm}) {
+    padding: 20px;
+  }
 `;
 const ContentContainer = styled.div`
   width: 100%;

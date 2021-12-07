@@ -15,7 +15,6 @@ function FriendList({ friendListInfo, userList, uid }) {
 
 
   function handleSearchFriend(value) {
-    console.log(uid);
 
     const userInfo = userList.find((user) => user.email === value);
 

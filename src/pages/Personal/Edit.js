@@ -50,7 +50,6 @@ function Edit({ uid, myCalendarMovies, userList, calendarMoviesInfo }) {
       movieInviteRef
         .where("event_doc_id", "==", paramId)
         .onSnapshot((querySnapshot) => {
-          console.log(querySnapshot.docs);
           var inviteIdArr = [];
           querySnapshot.forEach((docRef) => {
             inviteIdArr.push(docRef.data().to);
@@ -148,7 +147,6 @@ function Edit({ uid, myCalendarMovies, userList, calendarMoviesInfo }) {
         .then((querySnapshot) => {
           querySnapshot.forEach((docRef) => {
             const docData = docRef.data();
-            console.log(docRef.data());
             // 比對是否符合removeWatchWithUid的uid
             removeWatchWithUid.forEach((removeUid) => {
               if (removeUid === docData.uid) {
@@ -179,10 +177,6 @@ function Edit({ uid, myCalendarMovies, userList, calendarMoviesInfo }) {
   }
 
   function sendInvitation(inviteUid, selectDateData) {
-    console.log(selectDateData);
-    console.log(paramId);
-    console.log(uid);
-    console.log(scheduleInfo.movie_id);
     const data = {
       date: selectDateData,
       event_doc_id: paramId,
@@ -243,9 +237,6 @@ function Edit({ uid, myCalendarMovies, userList, calendarMoviesInfo }) {
         // 原始firebase有、最終state無｜ 刪除邀請
         querySnapshot.forEach((docRef) => {
           const docData = docRef.data();
-          console.log(movieInviteData);
-          console.log(docData);
-
           if (!movieInviteData.includes(docData.to)) {
             deleteInvitation(docData.invitation_id);
           }

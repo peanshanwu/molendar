@@ -12,8 +12,6 @@ function NowPlaying() {
   const [upComingMovie, setUpComingMovie] = useState();
   const [movieData, setMovieData] = useState();
 
-  console.log(nowPlayingMovie);
-
   useEffect(() => {
     let isMount = true;
     if (isMount) {
@@ -33,7 +31,6 @@ function NowPlaying() {
     setMovieData(nowPlayingMovie?.results[randomIndex]);
   }, [nowPlayingMovie]);
 
-  console.log(movieData);
 
   return (
     <>
@@ -79,8 +76,7 @@ const Title = styled.h3`
   font-size: 1.2rem;
 `;
 const Container = styled.div`
-  background-image: url(https://image.tmdb.org/t/p/w1280/${(props) =>
-    props.backdrop});
+  background-image: url(https://image.tmdb.org/t/p/w1280/${(props) => props.backdrop});
   background-color: ${Color.Background};
   background-size: cover;
   background-position: center;

@@ -3,10 +3,10 @@
 ## Demo
 * Link: https://molendar-shan.web.app/
 * **Test Account**
-    User-1: test1@gmail.com
-    Password: 111111
-    User-2: test2@gmail.com
-    Password: 222222
+    * User-1: test1@gmail.com
+    * Password: 111111
+    * User-2: test2@gmail.com
+    * Password: 222222
 ## Technologies
 * Fundamental
     * HTML5 / CSS3 / JavaScript ES6

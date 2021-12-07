@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState } from "react";
 import * as Color from "../../components/layout/Color";
 import styled from "styled-components";
 import { ImCross } from "react-icons/im";
@@ -36,9 +35,6 @@ export default function Comment({ info, uid, id }) {
         console.error("Error removing document: ", error);
       });
   }
-
-  console.log(uid);
-  console.log(`info`, info);
 
   return (
     <CommentContainer

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import * as Color from "../../components/layout/Color";
 import { fetchCollectionMovies } from "../../utils/api";
 import CollectionItem from "./CollectionItem";

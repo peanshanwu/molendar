@@ -8,14 +8,12 @@ import * as Title from "../../components/layout/Title";
 import * as Container from "../../components/layout/Container";
 import * as BreakPoint from "../../components/layout/BreakPoints";
 import Loading from "../../components/layout/Loading";
+import { v4 as uuidv4 } from 'uuid';
 
 export default function SearchList() {
   const { query } = useParams();
   const [searchInfo, setSearchInfo] = useState();
   const [isLoading, setIsLoading] = useState(true);
-
-  console.log(query);
-  console.log(searchInfo);
 
   useEffect(() => {
     let isMounted = true;
@@ -44,7 +42,7 @@ export default function SearchList() {
                     : `https://firebasestorage.googleapis.com/v0/b/molendar-shan.appspot.com/o/default_photo.png?alt=media&token=376c66cd-730d-44b7-a2f1-347999a60c02`;
 
                   return (
-                    <Movie>
+                    <Movie key={uuidv4()}>
                       <Link to={`/movie/${result.id}`}>
                         <Poster
                           src={url}

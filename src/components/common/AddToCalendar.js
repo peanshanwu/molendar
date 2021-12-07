@@ -6,9 +6,14 @@ import { format } from "date-fns";
 import * as Color from "../../components/layout/Color";
 import swal from "sweetalert";
 
+
+// redux
+import { useSelector } from "react-redux";
+
 export default function AddToCalendarIcon({ uid, selectDay, movieId }) {
   const db = firebase.firestore();
   const userRef = db.collection("users");
+  const isLogin = useSelector(state => state.isLogin)
   // const formatSelectDay = format(selectDay, "yyyy-MM-dd")
   //   .split("-")
   //   .map((e) => e);
@@ -46,7 +51,7 @@ export default function AddToCalendarIcon({ uid, selectDay, movieId }) {
       });
   }
 
-  return <> {uid ? <AddToCalendar onClick={clickAdd} /> : null} </> ;
+  return <> {isLogin ? <AddToCalendar onClick={clickAdd} /> : null} </> ;
 }
 
 const iconStyle = {

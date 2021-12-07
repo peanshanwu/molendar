@@ -79,7 +79,6 @@ export function acceptMovieInvitation(
   movieInviteInfo,
   setMovieInviteInfo
 ) {
-  console.log("Accept!");
   // 刪除電影邀請
   movieInviteRef
     .doc(invitation_id)
@@ -98,13 +97,11 @@ export function acceptMovieInvitation(
       querySnapshot.forEach((docRef) => {
         const docData = docRef.data();
         originWatchWithArr = [...docData.watchWith];
-        console.log(docData);
         userRef
           .doc(docData.uid)
           .collection("user_calendar")
           .doc(docData.doc_id)
           .set({ watchWith: [...docData.watchWith, uid] }, { merge: true });
-        console.log(originWatchWithArr);
       });
       // 加入currentUser的calendar
       const scheduleData = {

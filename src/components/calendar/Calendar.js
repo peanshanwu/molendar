@@ -23,14 +23,14 @@ const Calendar = ({ selectDay, setSelectDay }) => {
       <DatePicker>
         <thead>
           <MonthControl>
-            <td colSpan="100%">
+            <TdRelative colSpan="100%">
               {format(startDay, "MMMM ")}
               {format(startDay, "yyyy")}
               <IconWrap>
                 <PreMonthBtn onClick={calendar.setPreMonth} />
                 <NextMonthBtn onClick={calendar.setNextMonth} />
               </IconWrap>
-            </td>
+            </TdRelative>
           </MonthControl>
         </thead>
         <tbody>
@@ -49,7 +49,6 @@ const Calendar = ({ selectDay, setSelectDay }) => {
                     isSelected && "selected"
                   }`;
                   const selectedToday = () => {
-                    console.log("hi");
                     selectDate(date.date);
                   };
                   return (
@@ -67,6 +66,9 @@ const Calendar = ({ selectDay, setSelectDay }) => {
   );
 };
 
+const TdRelative = styled.td`
+  position: relative;
+`
 const IconWrap = styled.div`
   position: absolute;
   top: 0;

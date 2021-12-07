@@ -17,18 +17,18 @@ import { fetchMultiMovies } from "./utils/api";
 import NoMatch from "./pages/Others/NoMatch";
 import SigninAlert from "./components/common/SigninAlert";
 import Loading from "./components/layout/Loading";
-import styled from "styled-components";
 
 
 // redux
 import { useDispatch } from "react-redux";
 import { getCurrentUserInfo } from "./redux/action";
+import { getIsLogin } from "./redux/action"
+
 
 function App() {
   const dispatch = useDispatch();
   const db = firebase.firestore();
   const userRef = db.collection("users");
-  // const [uid, setUid] = useState(null); //儲存uid，要改成redux
   const [uid, setUid] = useState(); //儲存uid，要改成redux
   const [user, setUser] = useState(); //儲存uid，要改成redux
   const [userList, setUserList] = useState([]); // 所有user的資料
@@ -39,14 +39,15 @@ function App() {
   useEffect(() => {
     // 取得使用者資料為非同步
     firebase.auth().onAuthStateChanged((currentUser) => {
-      console.log("onAuthStateChanged 回傳", currentUser);
       setUser(currentUser);
 
       if (currentUser) {
         setUid(currentUser.uid);
         setIsLogin(true)
+        dispatch(getIsLogin(true));
       } else {
         setIsLogin(false)
+        dispatch(getIsLogin(false));
       }
       
     });
@@ -58,7 +59,7 @@ function App() {
         // setCurrentUserInfo(doc.data());
         dispatch(getCurrentUserInfo(doc.data()));
       });
-  }, [uid]);
+  }, [uid, userRef, dispatch]);
 
   useEffect(() => {
     let isMounted = true;
@@ -98,9 +99,6 @@ function App() {
       });
   }, []);
 
-  console.log(`uid`, uid);
-  console.log(`user`, user);
-  console.log(`isLogin`, isLogin);
 
   return (
     <>
@@ -143,7 +141,7 @@ function App() {
           </Route>
 
           <Route exact path="/movie/:id">
-            <Movie uid={uid} userList={userList} />
+            <Movie uid={uid} userList={userList} isLogin={isLogin}/>
           </Route>
           <Route exact path="/search/:query">
             <SearchList />
