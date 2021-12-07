@@ -10,7 +10,6 @@ function Search({ style, setDisplaySearchBar }) {
   const [searchValue, setSearchValue] = useState("");
 
   function searchMovie(e) {
-    console.log(searchValue);
     setSearchValue(e.target.value);
   }
 

@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import Background from "../../image/member-bg.png";
 import PersonalCalendar from "./PersonalCalendar";
 import Profile from "./Profile";
 import FriendList from "./FriendList";
 import * as Color from "../../components/layout/Color";
-import { ImCheckmark, ImCross } from "react-icons/im";
-import { IoPersonAdd } from "react-icons/io5";
 import firebase from "../../utils/firebase";
 import { fetchMovie } from "../../utils/api";
 import NowPlaying from "./NowPlaying";
@@ -84,7 +81,6 @@ function Personal({ uid, userList, myCalendarMovies, calendarMoviesInfo }) {
           // 時間排序
           let arr = [];
           querySnapshot.forEach((docRef) => {
-            console.log(docRef);
             arr.push(docRef.data());
           });
           arr.sort((a, b) => {
@@ -129,8 +125,6 @@ function Personal({ uid, userList, myCalendarMovies, calendarMoviesInfo }) {
     };
   }, [uid, userList]);
 
-
-  console.log(movieInviteInfo);
 
   return (
     <>

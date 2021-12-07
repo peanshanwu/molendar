@@ -96,7 +96,6 @@ function Signin() {
         .createUserWithEmailAndPassword(email, password) //回傳一個promise物件
         .then((userCredential) => {
           const user = userCredential.user;
-          console.log(user);
 
           // 創建一個新user到firebase firestore
           userRef.doc(user.uid).set({

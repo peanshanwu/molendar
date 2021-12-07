@@ -5,10 +5,14 @@ import { IoHeartCircleSharp } from "react-icons/io5";
 import * as Color from "../../components/layout/Color";
 import swal from "sweetalert";
 
+// redux
+import { useSelector } from "react-redux";
+
 export default function AddToCollection({ uid, movieId }) {
   const db = firebase.firestore();
   const userRef = db.collection("users");
   const [collected, setCollected] = useState(false);
+  const isLogin = useSelector(state => state.isLogin)
 
   useEffect(() => {
     uid &&
@@ -48,7 +52,7 @@ export default function AddToCollection({ uid, movieId }) {
 
   return (
     <>
-      {uid
+      {isLogin
         ? <Icon onClick={() => clickAdd(movieId)} collected={collected} />
         : null
       }

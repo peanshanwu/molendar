@@ -1,20 +1,19 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import React, {useState, useRef } from "react";
 import * as Color from "../../components/layout/Color";
 import styled from "styled-components";
-import StarRating from "./StarRating";
 import firebase from "../../utils/firebase";
 import * as BreakPoint from "../../components/layout/BreakPoints";
 import { FaStar } from "react-icons/fa";
-
 import swal from "sweetalert";
+
+
 
 export default function WriteComment({ id, uid }) {
   const db = firebase.firestore();
   const commentRef = db.collection("user_comments");
   const commentAreaRef = useRef();
   const [comment, setComment] = useState("");
-  const [allCommentInfo, setAllCommentInfo] = useState(null);
+
 
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);

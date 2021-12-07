@@ -15,8 +15,6 @@ function Header({ user }) {
   const history = useHistory();
   const [displaySearchBar, setDisplaySearchBar] = useState(false);
 
-  console.log(displaySearchBar);
-
   function showSearchBar() {
     if (displaySearchBar) {
       setDisplaySearchBar(false);

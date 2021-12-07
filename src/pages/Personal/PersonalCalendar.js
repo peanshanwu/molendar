@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useState } from "react";
 import { format, getDate, isSameDay } from "date-fns";
 import useCalendar, { WEEKS } from "../../components/calendar/useCalendar.js";
@@ -6,16 +6,8 @@ import * as Styled from "../../components/calendar/Calendar-styled";
 import * as Color from "../../components/layout/Color";
 import styled from "styled-components";
 import Info from "./Info";
-import firebase from "../../utils/firebase";
 import * as BreakPoint from "../../components/layout/BreakPoints"
-import { fetchMultiMovies } from "../../utils/api.js";
 
-// setSelectDay={setSelectDay}
-// selectDay={selectDay}
-// uid={uid}
-// userList={userList}
-// myCalendarMovies={myCalendarMovies}
-// calendarMoviesInfo={calendarMoviesInfo}
 
 const PersonalCalendar = ({
   selectDay,
@@ -25,43 +17,13 @@ const PersonalCalendar = ({
   myCalendarMovies,
   calendarMoviesInfo,
 }) => {
-  const db = firebase.firestore();
-  const userRef = db.collection("users");
   const [startDay, setStartDay] = useState(new Date());
   const [popupClick, setPopupClick] = useState(false);
-  // const [myCalendarMovies, setMyMovies] = useState([])
-  // const [movieInfo, setMovieInfo] = useState([])
   const calendar = useCalendar(startDay, setStartDay);
 
   const selectDate = (date) => {
     setSelectDay(date);
   };
-
-  // useEffect(() => {
-
-  //   uid && (
-  // 		userRef.doc(uid).collection('user_calendar').get()
-  // 		.then((snapshot) => {
-  // 			let myMoviesArr = [];
-  // 			snapshot.docs.forEach(doc => {
-  // 				myMoviesArr.push(doc.data())
-  // 			})
-  // 			setMyMovies(myMoviesArr)
-  // 			return myMoviesArr
-  // 		})
-  // 		.then((myMoviesArr) => {
-  // 			fetchMultiMovies(myMoviesArr)
-  // 			.then((movieInfo) => {
-  // 				setMovieInfo(movieInfo)
-  // 			})
-  // 		})
-  //     .catch(err => {
-  //       console.log(`err`,err);
-  //       console.log(`err status`,err.code);
-  //     })
-  // 	)
-
-  // }, [])
 
   function getMovieId(date) {
     if (myCalendarMovies.length) {
@@ -87,7 +49,6 @@ const PersonalCalendar = ({
     }
   }
 
-  console.log(calendarMoviesInfo);
 
   return (
     <>

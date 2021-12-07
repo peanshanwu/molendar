@@ -18,7 +18,7 @@ import * as BreakPoint from "../../components/layout/BreakPoints"
 
 // const isoConv = require("iso-language-converter");
 
-function Movie({ uid, userList }) {
+function Movie({ uid, userList, isLogin }) {
   const { id } = useParams();
   const [movieDetail, setMovieDetail] = useState();
   const [castInfo, setCastInfo] = useState();
@@ -56,7 +56,6 @@ function Movie({ uid, userList }) {
           commentsArr.push(obj);
         });
 
-        console.log(`commentsArr`, commentsArr);
         setCommentInfo(commentsArr);
       });
   }, [userList]);
@@ -115,7 +114,7 @@ function Movie({ uid, userList }) {
           <Wrap>
             <Container>
               <Title.Sub>All Comments</Title.Sub>
-              {uid ? <WriteComment id={id} uid={uid} /> : <LoginFirst />}
+              {isLogin ? <WriteComment id={id} uid={uid} /> : <LoginFirst />}
               {commentInfo &&
                 commentInfo.map((info) => {
                   return <Comment info={info} uid={uid} id={id} />;

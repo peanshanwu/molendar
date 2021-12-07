@@ -4,3 +4,10 @@ export const getCurrentUserInfo = (userInfo) => {
     payload: userInfo,
   };
 };
+
+export const getIsLogin = (isLogin) => {
+  return {
+    type: "IS_LOGIN",
+    payload: isLogin,
+  };
+}

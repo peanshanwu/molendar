@@ -5,11 +5,11 @@ import Loading from "../../components/layout/Loading";
 import { Main } from "../../components/layout/Container";
 import MovieInfo from "./MovieInfo";
 import Banner from "../../components/common/Banner";
-import Carousel from "./Carousel";
 import Calendar from "../../components/calendar/Calendar";
 import calendarBackground from "../../image/index-calendar-bg.png";
 import { fetchUpcomingNowPlayingMovies } from "../../utils/api";
 import ScrollDown from "./ScrollDown";
+import IndexUpcoming from "./IndexUpcoming"
 import * as BreakPoint from "../../components/layout/BreakPoints"
 import getRandomMovie from "../../components/common/RandomMovie";
 import { fetchMovie } from "../../utils/api";
@@ -63,8 +63,8 @@ function Index({ uid }) {
       {isLoading
         ? <Loading />
         : <>
-          <Banner movieData={movieData} trailerKey={trailerKey}/>
-            <Carousel upComingMovie={upcomingMovie} />
+          <Banner movieData={movieData} trailerKey={trailerKey} />
+            <IndexUpcoming upComingMovie={upcomingMovie}/>
             <CalendarBackground>
               <ScrollDownWrap showScroll={showScroll}>
                 <ScrollDown />
@@ -126,7 +126,6 @@ const Title = styled.h3`
   color: ${Color.Content};
   transform: rotate(90deg);
   transform-origin: 0 0;
-  /* top: 0; */
   left: 10px;
   font-size: 2.5rem;
   font-weight: 100;
@@ -137,8 +136,16 @@ const Title = styled.h3`
 const ScrollDownWrap = styled.div`
   opacity: ${(props) => (props.showScroll ? "1" : "0")};
   position: absolute;
-  top: 55px;
+  top: 95px;
   left: 2rem;
   transition: ease-in 0.3s;
+  @media (max-width: 1000px) {
+    top: 545px;
+  }
+  @media (max-width: ${BreakPoint.sm}) {
+    left: auto;
+    right: 2rem;
+    top: 565px;
+  }
 `;
 export default Index;
