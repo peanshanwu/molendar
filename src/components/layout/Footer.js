@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 import logo from "../../image/footer-logo.png";
 import { Link } from "react-router-dom";
