@@ -95,7 +95,7 @@ function App() {
         setUserList(userArr);
       })
       .catch((err) => {
-        console.err(err);
+        console.error(err);
       });
   }, []);
 
