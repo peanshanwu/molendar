@@ -6,12 +6,14 @@ import * as Color from "./Color";
 import * as BreakPoint from "../../components/layout/BreakPoints"
 
 function Footer() {
+  const currentYear = new Date().getFullYear();
+  
   return (
       <Container>
         <LinkLogo to="/">
           <FooterLogo src={logo}></FooterLogo>
         </LinkLogo>
-        <Right>© 2021 Pean Shan Wu. All rights reserved.</Right>
+        <Right>© {currentYear} Shan Wu. All rights reserved.</Right>
       </Container>
   );
 }
